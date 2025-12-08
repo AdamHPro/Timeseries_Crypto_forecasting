@@ -8,10 +8,16 @@ The project have a dataset of a crypto as an input, the period of time analyse, 
 
 ## Stack
 
-- Python
+- Backend: Python
 - Pandas
 - Numpy
 - Matplotlib
 - Scikit-learn
 - TensorFlow/Keras
 - Jupyter Notebook
+- Frontend: React.js
+- Orchestration: Flask
+- Database: PostgreSQL
+- Deployment: Docker
+- Version Control: Git/GitHub
+- Cloud: AWS/GCP
