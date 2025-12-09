@@ -26,3 +26,6 @@ The project have a dataset of a crypto as an input, the period of time analyse, 
 
 - Understand the fundamentals of time series analysis and forecasting.
 - Gain hands-on experience with LSTM neural networks for time series prediction.
+- Learn to preprocess and visualize time series data.
+- Develop skills in building and deploying machine learning models using Python and relevant libraries.
+- Explore the application of deep learning techniques in financial markets, specifically cryptocurrency price prediction.
