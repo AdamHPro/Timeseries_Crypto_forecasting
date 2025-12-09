@@ -21,3 +21,8 @@ The project have a dataset of a crypto as an input, the period of time analyse, 
 - Deployment: Docker
 - Version Control: Git/GitHub
 - Cloud: AWS/GCP
+
+## Learning objectives
+
+- Understand the fundamentals of time series analysis and forecasting.
+- Gain hands-on experience with LSTM neural networks for time series prediction.
