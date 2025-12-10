@@ -29,3 +29,5 @@ The project have a dataset of a crypto as an input, the period of time analyse, 
 - Learn to preprocess and visualize time series data.
 - Develop skills in building and deploying machine learning models using Python and relevant libraries.
 - Explore the application of deep learning techniques in financial markets, specifically cryptocurrency price prediction.
+- Advise on best practices for model evaluation and performance tuning in time series forecasting tasks.
+- Understand the challenges and considerations when working with cryptocurrency data, such as volatility and market trends.
