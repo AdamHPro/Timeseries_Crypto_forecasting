@@ -34,3 +34,7 @@ The project have a dataset of a crypto as an input, the period of time analyse, 
 - Gain experience in integrating machine learning models into web applications for real-time predictions.
 - Learn to use Docker for containerization and deployment of machine learning applications.
 - Explore cloud platforms for hosting and scaling machine learning applications.
+
+## Project Duration
+
+The project is expected to take approximately 8-12 weeks, depending on the complexity of the model and the depth of analysis required.
