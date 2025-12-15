@@ -38,3 +38,9 @@ The project have a dataset of a crypto as an input, the period of time analyse, 
 ## Project Duration
 
 The project is expected to take approximately 8-12 weeks, depending on the complexity of the model and the depth of analysis required.
+
+## Structure
+
+- `api/`: Contains the FastAPI code for serving the model.
+- `etl/`: Contains scripts for data extraction, transformation, and loading.
+- `front/`: Contains the React.js frontend code.
