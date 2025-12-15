@@ -48,4 +48,4 @@ services:
       - /app/node_modules
     environment:
       # The API URL for React to make its fetch() requests
-      REACT_APP_API_URL: http://localhost:8000
+      VITE_API_URL: http://localhost:8000
