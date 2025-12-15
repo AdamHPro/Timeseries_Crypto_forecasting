@@ -1,7 +1,6 @@
 version: "3.8"
 
 services:
-  # --- 1. Database (La mémoire) ---
   db:
     image: postgres:15
     environment:
@@ -9,46 +8,44 @@ services:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
     volumes:
-      # PERSISTANCE : Les données sont stockées dans un dossier 'postgres_data' sur ton PC
+      # PERSISTENCE: Data is stored in postgres_data folder on host
       - ./postgres_data:/var/lib/postgresql/data
 
-  # --- 2. ETL (Le constructeur) ---
   etl:
     build: ./etl
     depends_on:
       - db
     volumes:
-      # CODE : Pour développer sans relancer
+      #To dev without relaunch
       - ./etl:/app
-      # PARTAGE : Pour déposer le modèle entraîné
+      # SHARED: To deposit the trained model
       - ./shared_models:/app/models
     environment:
       DATABASE_URL: postgresql://user:password@db:5432/bitcoin_db
 
-  # --- 3. FastAPI (Le serveur) ---
+  #Fastapi service
   api:
     build: ./api
     ports:
       - "8000:8000"
     volumes:
-      # CODE : Hot-reload du backend
+      #Hot-reload of the backend
       - ./api:/app
-      # PARTAGE : Pour lire le modèle déposé par l'ETL (Lecture seule recommandée ro)
       - ./shared_models:/app/models:ro
     environment:
-      # L'API a aussi besoin de la DB pour lire l'historique récent si besoin
+      #The api also needs the db
       DATABASE_URL: postgresql://user:password@db:5432/bitcoin_db
 
-  # --- 4. Frontend React (La vitrine) ---
+  #Frontend React
   front:
     build: ./front
     ports:
       - "3000:3000"
     volumes:
-      # CODE : Hot-reload du React
+      # CODE : Hot-reload of React
       - ./front/src:/app/src
-      # Astuce Node : Ne pas écraser les node_modules du conteneur avec ceux du local
+      # Node tip: Do not overwrite container's node_modules with local ones
       - /app/node_modules
     environment:
-      # L'URL de l'API pour que React puisse faire ses fetch()
+      # The API URL for React to make its fetch() requests
       REACT_APP_API_URL: http://localhost:8000
