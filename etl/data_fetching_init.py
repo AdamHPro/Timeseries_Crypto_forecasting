@@ -3,6 +3,7 @@ from datetime import datetime
 import logging
 import psycopg2
 from psycopg2 import extras
+import os
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(
@@ -15,11 +16,14 @@ now = datetime.now()
 formatted_date = now.strftime("%d/%m/%Y")
 
 # Configuration for database connection
-DB_HOST = "localhost"  # Usually localhost if Docker maps the port
-DB_NAME = "postgres"  # Default DB name, change if you created another
-DB_USER = "postgres"  # Default user
-DB_PASS = "postgres"  # The one defined in POSTGRES_PASSWORD
-DB_PORT = "5433"
+# Usually localhost if Docker maps the port
+DB_HOST = os.getenv("DB_HOST", "localhost")
+
+DB_NAME = os.getenv("DB_NAME", "postgres")
+DB_USER = os.getenv("DB_USER", "postgres")  # Default user
+# The one defined in POSTGRES_PASSWORD
+DB_PASS = os.getenv("DB_PASS", "postgres")
+DB_PORT = os.getenv("DB_PORT", "5433")
 
 
 def init_db():
