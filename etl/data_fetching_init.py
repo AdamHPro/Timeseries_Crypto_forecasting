@@ -5,6 +5,11 @@ import psycopg2
 from psycopg2 import extras
 
 logger = logging.getLogger(__name__)
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
 
 now = datetime.now()
 formatted_date = now.strftime("%d/%m/%Y")
@@ -19,6 +24,7 @@ DB_PORT = "5433"
 
 def init_db():
     try:
+        logger.info("Fetching historical crypto data from investpy...")
         df = investpy.get_crypto_historical_data(
             crypto='bitcoin', from_date='01/01/2016', to_date=formatted_date)
     except Exception as e:
@@ -26,7 +32,7 @@ def init_db():
         return None
 
     try:
-        # Establish the connection
+        logger.info("Connecting to the PostgreSQL database...")
         connection = psycopg2.connect(
             user=DB_USER,
             password=DB_PASS,
@@ -35,6 +41,7 @@ def init_db():
             database=DB_NAME
         )
         cursor = connection.cursor()
+        logger.info("Creating table and inserting data...")
         create_table_query = '''
         CREATE TABLE IF NOT EXISTS market_data (
             trading_date DATE PRIMARY KEY,     -- The index (Date)
