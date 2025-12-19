@@ -5,6 +5,7 @@ import psycopg2
 from psycopg2 import extras
 import os
 
+# This must be put in the "main.py" file
 logger = logging.getLogger(__name__)
 logging.basicConfig(
     level=logging.INFO,
