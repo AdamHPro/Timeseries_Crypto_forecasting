@@ -2,6 +2,8 @@ import investpy
 import os
 import logging
 import psycopg2
+from psycopg2 import extras
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -38,20 +40,58 @@ def get_latest_date_in_db():
         result = cursor.fetchone()
         latest_date = result[0] if result[0] is not None else '01/01/2016'
         logger.info(f"Latest date in DB: {latest_date}")
+        cursor.close()
+        connection.close()
         return latest_date.strftime("%d/%m/%Y")
     except Exception as e:
         logger.error(f"Error while fetching latest date from DB: {e}")
         return '01/01/2016'
 
 
-def update_db(start_date='01/01/2016', end_date='01/01/2021'):
+def update_db(start_date=get_latest_date_in_db(), end_date=datetime.now().strftime("%d/%m/%Y")):
     try:
         logger.info("Fetching historical crypto data from investpy...")
         df = investpy.get_crypto_historical_data(
             crypto='bitcoin', from_date=start_date, to_date=end_date)
-        return df
+        logger.info(
+            "Connecting to the PostgreSQL database to get the latest date...")
     except Exception as e:
         logger.error(f"Error while fetching data from investpy: {e}")
+        return None
+    try:
+        connection = psycopg2.connect(
+            user=DB_USER,
+            password=DB_PASS,
+            host=DB_HOST,
+            port=DB_PORT,
+            database=DB_NAME
+        )
+        cursor = connection.cursor()
+        df_clean = df.reset_index()
+        data_list = [tuple(x) for x in df_clean.to_numpy()]
+        logger.info("Inserting new data into the database...")
+        query = """
+        INSERT INTO market_data (
+                trading_date, 
+                open_price, 
+                high_price, 
+                low_price, 
+                close_price, 
+                volume, 
+                currency
+            )
+        VALUES %s
+        ON CONFLICT (trading_date) 
+        DO UPDATE SET 
+            trading_date = EXCLUDED.trading_date;
+        """
+        extras.execute_values(cursor, query, data_list)
+        connection.commit()
+        cursor.close()
+        connection.close()
+
+    except Exception as e:
+        logger.error(f"Error while connecting to the database: {e}")
         return None
 
 
