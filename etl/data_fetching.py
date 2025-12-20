@@ -23,6 +23,18 @@ DB_PASS = os.getenv("DB_PASS", "postgres")
 DB_PORT = os.getenv("DB_PORT", "5433")
 
 
+def pull_data_from_yfinance(start_date, end_date):
+    try:
+        logger.info(
+            f"Fetching historical crypto data from yfinance from {start_date} to {end_date}...")
+        df = yf.download("BTC-USD", start=start_date,
+                         end=end_date, progress=False)
+        return df
+    except Exception as e:
+        logger.error(f"Error while fetching data from yfinance: {e}")
+        return None
+
+
 def get_latest_date_in_db():
     try:
         logger.info(
@@ -49,16 +61,7 @@ def get_latest_date_in_db():
 
 
 def update_db(start_date=get_latest_date_in_db(), end_date=(datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d")):
-    try:
-        logger.info("Fetching historical crypto data from yfinance...")
-        logger.info(f"Fetching data from {start_date} to {end_date}")
-        df = yf.download("BTC-USD", start=start_date,
-                         end=end_date, progress=False)
-        logger.info(
-            "Connecting to the PostgreSQL database to get the latest date...")
-    except Exception as e:
-        logger.error(f"Error while fetching data from yfinance: {e}")
-        return None
+    df = pull_data_from_yfinance(start_date, end_date)
     try:
         connection = psycopg2.connect(
             user=DB_USER,
