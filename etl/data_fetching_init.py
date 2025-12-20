@@ -1,4 +1,4 @@
-import investpy
+import yfinance as yf
 from datetime import datetime
 import logging
 import psycopg2
@@ -14,7 +14,7 @@ logging.basicConfig(
 )
 
 now = datetime.now()
-formatted_date = now.strftime("%d/%m/%Y")
+formatted_date = now.strftime("%Y-%m-%d")
 
 # Configuration for database connection
 # Usually localhost if Docker maps the port
@@ -29,11 +29,11 @@ DB_PORT = os.getenv("DB_PORT", "5433")
 
 def init_db():
     try:
-        logger.info("Fetching historical crypto data from investpy...")
-        df = investpy.get_crypto_historical_data(
-            crypto='bitcoin', from_date='01/01/2016', to_date=formatted_date)
+        logger.info("Fetching historical crypto data from yfinance...")
+        df = yf.download("BTC-USD", start="2016-01-01",
+                         end=formatted_date, progress=False)
     except Exception as e:
-        logger.error(f"Error while fetching data from investpy: {e}")
+        logger.error(f"Error while fetching data from yfinance: {e}")
         return None
 
     try:
@@ -54,8 +54,7 @@ def init_db():
             high_price NUMERIC,
             low_price NUMERIC,
             close_price NUMERIC,
-            volume BIGINT,                     -- BIGINT for large volumes (integers)
-            currency VARCHAR(10)               -- Short text for 'USD', 'EUR', etc.
+            volume BIGINT                  -- BIGINT for large volumes (integers)
         );
         '''
         cursor.execute(create_table_query)
@@ -68,8 +67,7 @@ def init_db():
                 high_price, 
                 low_price, 
                 close_price, 
-                volume, 
-                currency
+                volume
             ) VALUES %s
             ON CONFLICT (trading_date) DO NOTHING;
         """

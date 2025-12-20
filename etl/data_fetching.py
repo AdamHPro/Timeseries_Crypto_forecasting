@@ -1,4 +1,4 @@
-import investpy
+import yfinance as yf
 import os
 import logging
 import psycopg2
@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 # This must be put in the "main.py" file
 logging.basicConfig(
-    level=logging.DEBUG,
+    level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S'
 )
@@ -42,22 +42,22 @@ def get_latest_date_in_db():
         logger.info(f"Latest date in DB: {latest_date}")
         cursor.close()
         connection.close()
-        return latest_date.strftime("%d/%m/%Y")
+        return latest_date.strftime("%Y-%m-%d")
     except Exception as e:
         logger.error(f"Error while fetching latest date from DB: {e}")
-        return '01/01/2016'
+        return '2016-01-01'
 
 
-def update_db(start_date=get_latest_date_in_db(), end_date=(datetime.now() + timedelta(days=1)).strftime("%d/%m/%Y")):
+def update_db(start_date=get_latest_date_in_db(), end_date=(datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d")):
     try:
-        logger.info("Fetching historical crypto data from investpy...")
-        logger.debug(f"Fetching data from {start_date} to {end_date}")
-        df = investpy.get_crypto_historical_data(
-            crypto='bitcoin', from_date=start_date, to_date=end_date)
+        logger.info("Fetching historical crypto data from yfinance...")
+        logger.info(f"Fetching data from {start_date} to {end_date}")
+        df = yf.download("BTC-USD", start=start_date,
+                         end=end_date, progress=False)
         logger.info(
             "Connecting to the PostgreSQL database to get the latest date...")
     except Exception as e:
-        logger.error(f"Error while fetching data from investpy: {e}")
+        logger.error(f"Error while fetching data from yfinance: {e}")
         return None
     try:
         connection = psycopg2.connect(
@@ -78,8 +78,7 @@ def update_db(start_date=get_latest_date_in_db(), end_date=(datetime.now() + tim
                 high_price, 
                 low_price, 
                 close_price, 
-                volume, 
-                currency
+                volume
             )
         VALUES %s
         ON CONFLICT (trading_date) 
