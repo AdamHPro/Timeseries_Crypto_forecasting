@@ -3,13 +3,13 @@ import os
 import logging
 import psycopg2
 from psycopg2 import extras
-from datetime import datetime
+from datetime import datetime, timedelta
 
 logger = logging.getLogger(__name__)
 
 # This must be put in the "main.py" file
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.DEBUG,
     format='%(asctime)s - %(levelname)s - %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S'
 )
@@ -48,9 +48,10 @@ def get_latest_date_in_db():
         return '01/01/2016'
 
 
-def update_db(start_date=get_latest_date_in_db(), end_date=datetime.now().strftime("%d/%m/%Y")):
+def update_db(start_date=get_latest_date_in_db(), end_date=(datetime.now() + timedelta(days=1)).strftime("%d/%m/%Y")):
     try:
         logger.info("Fetching historical crypto data from investpy...")
+        logger.debug(f"Fetching data from {start_date} to {end_date}")
         df = investpy.get_crypto_historical_data(
             crypto='bitcoin', from_date=start_date, to_date=end_date)
         logger.info(
@@ -89,6 +90,8 @@ def update_db(start_date=get_latest_date_in_db(), end_date=datetime.now().strfti
         connection.commit()
         cursor.close()
         connection.close()
+        logger.info(
+            f"Database update complete. Added {len(data_list)} records.")
 
     except Exception as e:
         logger.error(f"Error while connecting to the database: {e}")
