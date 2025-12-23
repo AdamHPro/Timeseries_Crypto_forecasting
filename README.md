@@ -44,3 +44,10 @@ The project is expected to take approximately 8-12 weeks, depending on the compl
 - `api/`: Contains the FastAPI code for serving the model.
 - `etl/`: Contains scripts for data extraction, transformation, and loading.
 - `front/`: Contains the React.js frontend code.
+- db: Postgresql database for storing historical cryptocurrency data.
+
+## Architecture
+
+The architecture of the project consists of the following components:
+
+1. Data Collection: Using APIs to gather new recent historical cryptocurrency data (comparison with the actual database, and upsert in the db). Train the model with the new data. (/etl)
