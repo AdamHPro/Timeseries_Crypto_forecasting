@@ -51,3 +51,5 @@ The project is expected to take approximately 8-12 weeks, depending on the compl
 The architecture of the project consists of the following components:
 
 1. Data Collection: Using APIs to gather new recent historical cryptocurrency data (comparison with the actual database, and upsert in the db). Train the model with the new data. A column "has_been_cleaned" is used to indicate whether the data has been cleaned. (/etl)
+
+2. Put the result in a volume, accesible by /api
