@@ -5,13 +5,9 @@ from psycopg2 import extras
 import os
 from data_fetching import pull_data_from_yfinance
 
-# This must be put in the "main.py" file
+
 logger = logging.getLogger(__name__)
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S'
-)
+
 
 now = datetime.now()
 formatted_date = now.strftime("%Y-%m-%d")
