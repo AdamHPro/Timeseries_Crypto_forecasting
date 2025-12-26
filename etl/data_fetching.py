@@ -14,6 +14,13 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S'
 )
 
+# This must be put in the "main.py" file
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
+
 DB_HOST = os.getenv("DB_HOST", "localhost")
 
 DB_NAME = os.getenv("DB_NAME", "postgres")
