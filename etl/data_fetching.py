@@ -23,6 +23,22 @@ DB_PASS = os.getenv("DB_PASS", "postgres")
 DB_PORT = os.getenv("DB_PORT", "5433")
 
 
+def save_to_parquet(df, filename="btc_data.parquet"):
+    """
+    Saves the dataframe to a parquet file acting as a Data Lake / Backup.
+    """
+    try:
+        # Create directory if it doesn't exist
+        os.makedirs("data_lake", exist_ok=True)
+        path = os.path.join("data_lake", filename)
+
+        # Save to parquet (with compression usually enabled by default)
+        df.to_parquet(path)
+        logger.info(f"Data successfully saved to Parquet at {path}")
+    except Exception as e:
+        logger.error(f"Failed to save Parquet file: {e}")
+
+
 def pull_data_from_yfinance(start_date, end_date):
     try:
         logger.info(
