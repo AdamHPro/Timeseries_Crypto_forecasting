@@ -67,7 +67,12 @@ def get_latest_date_in_db():
         return '2016-01-01'
 
 
-def update_db(start_date=get_latest_date_in_db(), end_date=(datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d")):
+def update_db(start_date=None, end_date=None):
+    if start_date == None:
+        start_date = get_latest_date_in_db()
+    if end_date == None:
+        end_date = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d")
+
     df = pull_data_from_yfinance(start_date, end_date)
     try:
         connection = psycopg2.connect(
