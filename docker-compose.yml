@@ -20,6 +20,7 @@ services:
       - ./etl:/app
       # SHARED: To deposit the trained model
       - ./shared_models:/app/models
+      - ./data_lake:/app/data_lake:ro
     environment:
       DATABASE_URL: postgresql://${DB_USER}:${DB_PASS}@db:5432/${DB_NAME}
 
