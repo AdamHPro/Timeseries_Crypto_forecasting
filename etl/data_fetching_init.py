@@ -3,7 +3,7 @@ import logging
 import psycopg2
 from psycopg2 import extras
 import os
-from data_fetching import pull_data_from_yfinance
+from data_fetching import pull_data_from_yfinance, save_to_parquet
 
 
 logger = logging.getLogger(__name__)
@@ -26,6 +26,7 @@ DB_PORT = os.getenv("DB_PORT", "5433")
 def init_db(start_date='2016-01-01'):
     df = pull_data_from_yfinance(
         start_date=start_date, end_date=formatted_date)
+    save_to_parquet(df)
 
     try:
         logger.info("Connecting to the PostgreSQL database...")

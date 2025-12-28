@@ -84,6 +84,7 @@ def update_db(start_date=None, end_date=None):
         end_date = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d")
 
     df = pull_data_from_yfinance(start_date, end_date)
+    save_to_parquet(df)
     try:
         connection = psycopg2.connect(
             user=DB_USER,
