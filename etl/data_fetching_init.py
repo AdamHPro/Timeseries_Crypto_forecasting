@@ -26,7 +26,8 @@ DB_PORT = os.getenv("DB_PORT", "5433")
 def init_db(start_date='2016-01-01'):
     df = pull_data_from_yfinance(
         start_date=start_date, end_date=formatted_date)
-    save_to_parquet(df)
+    filename = f"btc_data_{start_date}.parquet"
+    save_to_parquet(df, filename=filename)
 
     try:
         logger.info("Connecting to the PostgreSQL database...")
