@@ -29,8 +29,9 @@ def save_to_parquet(df, filename="btc_data.parquet"):
     """
     try:
         # Create directory if it doesn't exist
-        os.makedirs("data_lake", exist_ok=True)
-        path = os.path.join("data_lake", filename)
+        output_dir = "data_lake/btc_usd"
+        os.makedirs(output_dir, exist_ok=True)
+        path = os.path.join(output_dir, filename)
 
         # Save to parquet (with compression usually enabled by default)
         df.to_parquet(path)
