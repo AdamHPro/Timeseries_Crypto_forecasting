@@ -1,5 +1,8 @@
 node_modules
 .gitignore
-.git
-.venv
-postgres_data
+.venv/
+postgres_data/
+.env
+data_lake/
+__pycache__/
+data_lake/*.*
