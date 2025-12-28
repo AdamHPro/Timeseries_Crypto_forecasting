@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   db:
     image: postgres:15
@@ -23,7 +21,7 @@ services:
       # SHARED: To deposit the trained model
       - ./shared_models:/app/models
     environment:
-      DATABASE_URL: postgresql://user:password@db:5432/bitcoin_db
+      DATABASE_URL: postgresql://${DB_USER}:${DB_PASS}@db:5432/${DB_NAME}
 
   #Fastapi service
   api:
@@ -36,7 +34,7 @@ services:
       - ./shared_models:/app/models:ro
     environment:
       #The api also needs the db
-      DATABASE_URL: postgresql://user:password@db:5432/bitcoin_db
+      DATABASE_URL: postgresql://${DB_USER}:${DB_PASS}@db:5432/${DB_NAME}
 
   #Frontend React
   front:
