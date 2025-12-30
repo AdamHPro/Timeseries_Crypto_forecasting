@@ -74,12 +74,14 @@ def create_features_for_xgboost(df):
     return df
 
 
-# Convert to float
-df['Close'] = df['Close'].astype(str).str.replace(',', '').str.replace('$', '')
-df['Close'] = df['Close'].astype(float)
+def convert_to_float(df):
+    for col in ['Close', 'High', 'Low', 'Open']:
+        df[col] = df[col].astype(str).str.replace(',', '').str.replace('$', '')
+        df[col] = df[col].astype(float)
+    return df
 
-df['High'] = df['High'].astype(str).str.replace(',', '').str.replace('$', '')
-df['High'] = df['High'].astype(float)
+
+df = convert_to_float(df)
 
 df['Low'] = df['Low'].astype(str).str.replace(',', '').str.replace('$', '')
 df['Low'] = df['Low'].astype(float)
