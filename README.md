@@ -50,8 +50,10 @@ The project is expected to take approximately 8-12 weeks, depending on the compl
 
 The architecture of the project consists of the following components:
 
-1. Data Collection: Using APIs to gather new recent historical cryptocurrency data (comparison with the actual database, and upsert in the db). Train the model with the new data. A column "has_been_cleaned" is used to indicate whether the data has been cleaned. (/etl)
+1. Data Collection: Using APIs to gather new recent historical cryptocurrency data (comparison with the actual database, and upsert in the db). Store the new data in data_lake parquet. Train the model with the new data from data_lake. (/etl)
 
 2. Put the result in a volume, accesible by /api
 
 3. Model Serving: FastAPI application to serve the trained model and provide predictions via RESTful endpoints. (/api)
+
+4. Frontend Interface: React.js application to provide a user-friendly interface for interacting with the model and visualizing predictions. (/front)
