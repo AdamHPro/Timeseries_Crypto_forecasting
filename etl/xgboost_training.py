@@ -7,6 +7,8 @@ import xgboost as xgb
 import logging
 
 logger = logging.getLogger(__name__)
+
+# This must be put in the "main.py" file
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
