@@ -84,5 +84,3 @@ def update_db(start_date=None, end_date=None):
 
 if __name__ == "__main__":
     df = update_db()
-    if df is not None:
-        print(df.head())
