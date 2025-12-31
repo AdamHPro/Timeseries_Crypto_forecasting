@@ -4,12 +4,21 @@ from pathlib import Path
 import os
 import numpy as np
 import xgboost as xgb
+import logging
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
 
 CURRENT_DIR = Path(__file__).resolve().parent
 folder_data_lake = CURRENT_DIR.parent / "data_lake" / "btc_usd"
 
 
 def extract_df():
+    logging.info("Extracting data from Parquet data lake...")
     table = pq.read_table(folder_data_lake)
     df = table.to_pandas()
     df = df.reset_index()
@@ -19,6 +28,7 @@ def extract_df():
 
 
 def create_features_for_xgboost(df):
+    logging.info("Creating features for XGBoost model...")
     # --- Step 0: Data Cleaning ---
     # Convert 'Date' to datetime objects and sort chronologically
     if 'Date' in df.columns:
@@ -79,16 +89,15 @@ def create_features_for_xgboost(df):
 
 
 def convert_to_float(df):
+    logging.info("Converting price columns to float...")
     for col in ['Close', 'High', 'Low', 'Open']:
         df[col] = df[col].astype(str).str.replace(',', '').str.replace('$', '')
         df[col] = df[col].astype(float)
     return df
 
 
-df = convert_to_float(df)
-
-
 def correct_data_types(df):
+    logging.info("Correcting data types for price columns...")
     df['Low'] = df['Low'].astype(str).str.replace(',', '').str.replace('$', '')
     df['Low'] = df['Low'].astype(float)
 
@@ -98,30 +107,13 @@ def correct_data_types(df):
     return df
 
 
-df = correct_data_types(df)
-
-
-df = create_features_for_xgboost(df)
-
-# Prepare feature matrix X and target vector y
-
-
-def prepare_X_y(df, features_to_drop=['target', 'Open', 'High', 'Low']):
-
-    X = df.drop(columns=features_to_drop)
-    y = df['target']
-    return X, y
-
-
-X, y = prepare_X_y(df)
-
-
-def train_xgboost_model(X, y):
+def train_xgboost_model(df, features_to_drop=['target', 'Open', 'High', 'Low']):
+    logging.info("Training XGBoost model...")
     # We remove rows where 'target' is NaN (the last 7 days) because we can't learn from them.
     df_train = df.dropna(subset=['target'])
-    X_train = df_train.drop(columns=['target'])
+    X_train = df_train.drop(columns=features_to_drop)
     y_train = df_train['target']
-    X_latest = df.drop(columns=['target']).tail(1)
+    X_latest = df.drop(columns=features_to_drop).tail(1)
 
     model = xgb.XGBRegressor(objective='reg:squarederror', n_estimators=100)
     model.fit(X_train, y_train)
@@ -132,7 +124,7 @@ def train_xgboost_model(X, y):
     # Convert log return back to percentage for human readability
     predicted_return_pct = (np.exp(prediction_log_ret) - 1) * 100
 
-    print(
+    logging.info(
         f"Predicted return for the next 7 days: {predicted_return_pct[0]:.2f}%")
     return predicted_return_pct
 
@@ -142,5 +134,4 @@ if __name__ == "__main__":
     df = convert_to_float(df)
     df = correct_data_types(df)
     df = create_features_for_xgboost(df)
-    X, y = prepare_X_y(df)
-    predicted_return = train_xgboost_model(X, y)
+    predicted_return = train_xgboost_model(df)
