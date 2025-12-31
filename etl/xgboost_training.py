@@ -131,9 +131,15 @@ def train_xgboost_model(df, features_to_drop=['target', 'Open', 'High', 'Low']):
     return predicted_return_pct
 
 
-if __name__ == "__main__":
+def training_task(features_to_drop=['target', 'Open', 'High', 'Low']):
     df = extract_df()
     df = convert_to_float(df)
     df = correct_data_types(df)
     df = create_features_for_xgboost(df)
-    predicted_return = train_xgboost_model(df)
+    predicted_return = train_xgboost_model(df, features_to_drop)
+    return predicted_return
+
+
+if __name__ == "__main__":
+    predicted_return = training_task()
+    print(f"Predicted return for the next 7 days: {predicted_return[0]:.2f}%")
