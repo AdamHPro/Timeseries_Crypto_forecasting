@@ -4,6 +4,9 @@ import logging
 import psycopg2
 from psycopg2 import extras
 from datetime import datetime, timedelta
+from config import pull_db_config
+
+db_config = pull_db_config()
 
 logger = logging.getLogger(__name__)
 
@@ -14,13 +17,7 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S'
 )
 
-DB_HOST = os.getenv("DB_HOST", "localhost")
-
-DB_NAME = os.getenv("DB_NAME", "postgres")
-DB_USER = os.getenv("DB_USER", "postgres")  # Default user
-
-DB_PASS = os.getenv("DB_PASS", "postgres")
-DB_PORT = os.getenv("DB_PORT", "5433")
+db_config = pull_db_config()
 
 
 def save_to_parquet(df, filename="btc_data.parquet"):
@@ -57,11 +54,11 @@ def get_latest_date_in_db():
         logger.info(
             "Connecting to the PostgreSQL database to get the latest date...")
         connection = psycopg2.connect(
-            user=DB_USER,
-            password=DB_PASS,
-            host=DB_HOST,
-            port=DB_PORT,
-            database=DB_NAME
+            user=db_config["user"],
+            password=db_config["pass"],
+            host=db_config["host"],
+            port=db_config["port"],
+            database=db_config["name"]
         )
         cursor = connection.cursor()
         query = "SELECT MAX(trading_date) FROM market_data;"
@@ -89,11 +86,11 @@ def update_db(start_date=None, end_date=None):
     save_to_parquet(df, filename=filename)
     try:
         connection = psycopg2.connect(
-            user=DB_USER,
-            password=DB_PASS,
-            host=DB_HOST,
-            port=DB_PORT,
-            database=DB_NAME
+            user=db_config["user"],
+            password=db_config["pass"],
+            host=db_config["host"],
+            port=db_config["port"],
+            database=db_config["name"]
         )
         cursor = connection.cursor()
         df_clean = df.reset_index()
