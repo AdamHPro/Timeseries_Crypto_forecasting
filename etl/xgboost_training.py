@@ -7,11 +7,15 @@ import xgboost as xgb
 
 CURRENT_DIR = Path(__file__).resolve().parent
 folder_data_lake = CURRENT_DIR.parent / "data_lake" / "btc_usd"
-table = pq.read_table(folder_data_lake)
-df = table.to_pandas()
-df = df.reset_index()
-df.columns = [col[0] for col in df.columns]
-df = df.drop_duplicates(subset=['Date'], keep='last')
+
+
+def extract_df():
+    table = pq.read_table(folder_data_lake)
+    df = table.to_pandas()
+    df = df.reset_index()
+    df.columns = [col[0] for col in df.columns]
+    df = df.drop_duplicates(subset=['Date'], keep='last')
+    return df
 
 
 def create_features_for_xgboost(df):
@@ -83,33 +87,60 @@ def convert_to_float(df):
 
 df = convert_to_float(df)
 
-df['Low'] = df['Low'].astype(str).str.replace(',', '').str.replace('$', '')
-df['Low'] = df['Low'].astype(float)
 
-df['Open'] = df['Open'].astype(str).str.replace(',', '').str.replace('$', '')
-df['Open'] = df['Open'].astype(float)
+def correct_data_types(df):
+    df['Low'] = df['Low'].astype(str).str.replace(',', '').str.replace('$', '')
+    df['Low'] = df['Low'].astype(float)
+
+    df['Open'] = df['Open'].astype(str).str.replace(
+        ',', '').str.replace('$', '')
+    df['Open'] = df['Open'].astype(float)
+    return df
+
+
+df = correct_data_types(df)
+
 
 df = create_features_for_xgboost(df)
+
 # Prepare feature matrix X and target vector y
-features_to_drop = ['target', 'Open', 'High', 'Low']
-X = df.drop(columns=features_to_drop)
-
-y = df['target']
-# We remove rows where 'target' is NaN (the last 7 days) because we can't learn from them.
-df_train = df.dropna(subset=['target'])
-X_train = df_train.drop(columns=['target'])
-y_train = df_train['target']
-X_latest = df.drop(columns=['target']).tail(1)
 
 
-model = xgb.XGBRegressor(objective='reg:squarederror', n_estimators=100)
-model.fit(X_train, y_train)
+def prepare_X_y(df, features_to_drop=['target', 'Open', 'High', 'Low']):
 
-# --- Step 3: Predict the Future ---
-# We use the latest available data (X_latest) to forecast
-prediction_log_ret = model.predict(X_latest)
+    X = df.drop(columns=features_to_drop)
+    y = df['target']
+    return X, y
 
-# Convert log return back to percentage for human readability
-predicted_return_pct = (np.exp(prediction_log_ret) - 1) * 100
 
-print(f"Predicted return for the next 7 days: {predicted_return_pct[0]:.2f}%")
+X, y = prepare_X_y(df)
+
+
+def train_xgboost_model(X, y):
+    # We remove rows where 'target' is NaN (the last 7 days) because we can't learn from them.
+    df_train = df.dropna(subset=['target'])
+    X_train = df_train.drop(columns=['target'])
+    y_train = df_train['target']
+    X_latest = df.drop(columns=['target']).tail(1)
+
+    model = xgb.XGBRegressor(objective='reg:squarederror', n_estimators=100)
+    model.fit(X_train, y_train)
+    # --- Step 3: Predict the Future ---
+    # We use the latest available data (X_latest) to forecast
+    prediction_log_ret = model.predict(X_latest)
+
+    # Convert log return back to percentage for human readability
+    predicted_return_pct = (np.exp(prediction_log_ret) - 1) * 100
+
+    print(
+        f"Predicted return for the next 7 days: {predicted_return_pct[0]:.2f}%")
+    return predicted_return_pct
+
+
+if __name__ == "__main__":
+    df = extract_df()
+    df = convert_to_float(df)
+    df = correct_data_types(df)
+    df = create_features_for_xgboost(df)
+    X, y = prepare_X_y(df)
+    predicted_return = train_xgboost_model(X, y)
