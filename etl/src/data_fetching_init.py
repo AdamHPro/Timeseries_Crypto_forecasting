@@ -2,7 +2,7 @@ from datetime import datetime
 import logging
 import psycopg2
 from psycopg2 import extras
-import os
+from config import pull_db_config
 from data_fetching import pull_data_from_yfinance, save_to_parquet
 
 
@@ -11,16 +11,7 @@ logger = logging.getLogger(__name__)
 
 now = datetime.now()
 formatted_date = now.strftime("%Y-%m-%d")
-
-# Configuration for database connection
-# Usually localhost if Docker maps the port
-DB_HOST = os.getenv("DB_HOST", "localhost")
-
-DB_NAME = os.getenv("DB_NAME", "postgres")
-DB_USER = os.getenv("DB_USER", "postgres")  # Default user
-
-DB_PASS = os.getenv("DB_PASS", "postgres")
-DB_PORT = os.getenv("DB_PORT", "5433")
+db_config = pull_db_config()
 
 
 def init_db(start_date='2016-01-01'):
@@ -32,11 +23,11 @@ def init_db(start_date='2016-01-01'):
     try:
         logger.info("Connecting to the PostgreSQL database...")
         connection = psycopg2.connect(
-            user=DB_USER,
-            password=DB_PASS,
-            host=DB_HOST,
-            port=DB_PORT,
-            database=DB_NAME
+            user=db_config["user"],
+            password=db_config["pass"],
+            host=db_config["host"],
+            port=db_config["port"],
+            database=db_config["name"]
         )
         cursor = connection.cursor()
         logger.info("Creating table and inserting data...")
