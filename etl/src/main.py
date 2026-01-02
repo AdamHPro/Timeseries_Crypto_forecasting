@@ -1,25 +1,35 @@
 import logging
+from pathlib import Path
 from init_db import init_db
-from update_db import update_db
+from update_db import update_db, get_latest_date_in_db, save_permanent_backup_parquet
 from xgboost_training import training_task
-
+from data_fetching import pull_data_from_yfinance
+from datetime import datetime, timedelta
 
 logger = logging.getLogger(__name__)
 
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S'
+    datefmt='%Y-%m-%d %H:%M:%S',
+    force=True
 )
 
+CURRENT_DIR = Path(__file__).resolve().parent.parent
+output_dir = CURRENT_DIR.parent / "data_lake" / "btc_usd"
 
-def pipeline(init=False):
+
+def pipeline(init=False, output_dir=output_dir):
     logger.info("Starting ETL Pipeline...")
     if init:
         logger.info("Initializing database...")
         init_db()
     logger.info("Updating database with new data...")
-    output_dir = update_db()
+    start_date = get_latest_date_in_db()
+    end_date = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d")
+    data_path = pull_data_from_yfinance(output_dir, start_date, end_date)
+    save_permanent_backup_parquet(data_path, start_date, end_date)
+    update_db(data_path)
     logger.info("Training XGBoost model...")
     predicted_return = training_task(output_dir)
     logger.info("Pipeline completed successfully.")

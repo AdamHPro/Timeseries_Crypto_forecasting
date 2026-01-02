@@ -1,9 +1,10 @@
 import logging
+import shutil
+import os
+import pandas as pd
 import psycopg2
 from psycopg2 import extras
-from datetime import datetime, timedelta
 from config import pull_db_config
-from data_fetching import pull_data_from_yfinance, save_to_parquet
 
 logger = logging.getLogger(__name__)
 db_config = pull_db_config()
@@ -34,16 +35,16 @@ def get_latest_date_in_db():
         return '2016-01-01'
 
 
-def update_db(start_date=None, end_date=None):
-    if start_date == None:
-        start_date = get_latest_date_in_db()
-    if end_date == None:
-        end_date = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d")
-
-    df = pull_data_from_yfinance(start_date, end_date)
+def save_permanent_backup_parquet(data_path, start_date, end_date):
     filename = f"btc_data_{start_date}_{end_date}.parquet"
+    logger.debug(
+        f"Saving permanent backup parquet file from {data_path} as {filename}")
+    shutil.copy(data_path, os.path.join(os.path.dirname(data_path), filename))
 
-    output_dir = save_to_parquet(df, filename=filename)
+
+def update_db(data_path):
+    df = pd.read_parquet(data_path)
+
     try:
         connection = psycopg2.connect(
             user=db_config["user"],
@@ -76,7 +77,6 @@ def update_db(start_date=None, end_date=None):
         connection.close()
         logger.info(
             f"Database update complete. Added {len(data_list)} records.")
-        return output_dir
 
     except Exception as e:
         logger.error(f"Error while connecting to the database: {e}")
