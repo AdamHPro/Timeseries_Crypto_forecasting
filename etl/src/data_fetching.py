@@ -13,7 +13,7 @@ def save_to_parquet(df, filename="btc_data.parquet"):
     try:
         # Create directory if it doesn't exist
         CURRENT_DIR = Path(__file__).resolve().parent.parent
-        output_dir = CURRENT_DIR / "data_lake" / "btc_usd"
+        output_dir = CURRENT_DIR.parent / "data_lake" / "btc_usd"
         os.makedirs(output_dir, exist_ok=True)
         path = os.path.join(output_dir, filename)
 
