@@ -4,13 +4,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-# This must be put in the "main.py" file
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S'
-)
-
 
 def save_to_parquet(df, filename="btc_data.parquet"):
     """
