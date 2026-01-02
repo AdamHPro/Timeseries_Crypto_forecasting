@@ -43,7 +43,7 @@ def update_db(start_date=None, end_date=None):
     df = pull_data_from_yfinance(start_date, end_date)
     filename = f"btc_data_{start_date}_{end_date}.parquet"
 
-    save_to_parquet(df, filename=filename)
+    output_dir = save_to_parquet(df, filename=filename)
     try:
         connection = psycopg2.connect(
             user=db_config["user"],
@@ -76,11 +76,8 @@ def update_db(start_date=None, end_date=None):
         connection.close()
         logger.info(
             f"Database update complete. Added {len(data_list)} records.")
+        return output_dir
 
     except Exception as e:
         logger.error(f"Error while connecting to the database: {e}")
         return None
-
-
-if __name__ == "__main__":
-    df = update_db()

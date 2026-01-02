@@ -1,6 +1,5 @@
 import pandas as pd
 import pyarrow.parquet as pq
-from pathlib import Path
 import numpy as np
 import xgboost as xgb
 import logging
@@ -14,11 +13,8 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S'
 )
 
-CURRENT_DIR = Path(__file__).resolve().parent.parent
-folder_data_lake = CURRENT_DIR.parent / "data_lake" / "btc_usd"
 
-
-def extract_df():
+def extract_df(folder_data_lake):
     logging.info("Extracting data from Parquet data lake...")
     table = pq.read_table(folder_data_lake)
     df = table.to_pandas()
@@ -130,8 +126,8 @@ def train_xgboost_model(df, features_to_drop=['target', 'Open', 'High', 'Low']):
     return predicted_return_pct
 
 
-def training_task(features_to_drop=['target', 'Open', 'High', 'Low']):
-    df = extract_df()
+def training_task(output_dir, features_to_drop=['target', 'Open', 'High', 'Low']):
+    df = extract_df(output_dir)
     df = convert_to_float(df)
     df = correct_data_types(df)
     df = create_features_for_xgboost(df)

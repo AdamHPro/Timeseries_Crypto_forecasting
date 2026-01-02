@@ -19,9 +19,9 @@ def pipeline(init=False):
         logger.info("Initializing database...")
         init_db()
     logger.info("Updating database with new data...")
-    update_db()
+    output_dir = update_db()
     logger.info("Training XGBoost model...")
-    predicted_return = training_task()
+    predicted_return = training_task(output_dir)
     logger.info("Pipeline completed successfully.")
     return predicted_return
 

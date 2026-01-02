@@ -1,6 +1,7 @@
 import yfinance as yf
 import os
 import logging
+from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
@@ -11,15 +12,18 @@ def save_to_parquet(df, filename="btc_data.parquet"):
     """
     try:
         # Create directory if it doesn't exist
-        output_dir = "data_lake/btc_usd"
+        CURRENT_DIR = Path(__file__).resolve().parent.parent
+        output_dir = CURRENT_DIR / "data_lake" / "btc_usd"
         os.makedirs(output_dir, exist_ok=True)
         path = os.path.join(output_dir, filename)
 
         # Save to parquet (with compression usually enabled by default)
         df.to_parquet(path)
         logger.info(f"Data successfully saved to Parquet at {path}")
+        return output_dir
     except Exception as e:
         logger.error(f"Failed to save Parquet file: {e}")
+        return None
 
 
 def pull_data_from_yfinance(start_date, end_date):
