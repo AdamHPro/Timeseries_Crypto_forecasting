@@ -25,12 +25,15 @@ def pipeline(init=False, output_dir=output_dir):
         logger.info("Initializing database...")
         init_db()
     logger.info("Updating database with new data...")
-    start_date = get_latest_date_in_db()
+    start_date = get_latest_date_in_db()  # Get latest date from DB
     end_date = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d")
+    # Pull new data and save to parquet
     data_path = pull_data_from_yfinance(output_dir, start_date, end_date)
+    # Save permanent backup in parquet
     save_permanent_backup_parquet(data_path, start_date, end_date)
-    update_db(data_path)
+    update_db(data_path)  # Update DB with new data (from parquet to postgres)
     logger.info("Training XGBoost model...")
+    # Clean Data and Train XGBoost model and get prediction
     predicted_return = training_task(output_dir)
     logger.info("Pipeline completed successfully.")
     return predicted_return
