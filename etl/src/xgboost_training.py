@@ -1,7 +1,6 @@
 import pandas as pd
 import pyarrow.parquet as pq
 from pathlib import Path
-import os
 import numpy as np
 import xgboost as xgb
 import logging
@@ -15,7 +14,7 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S'
 )
 
-CURRENT_DIR = Path(__file__).resolve().parent
+CURRENT_DIR = Path(__file__).resolve().parent.parent
 folder_data_lake = CURRENT_DIR.parent / "data_lake" / "btc_usd"
 
 
