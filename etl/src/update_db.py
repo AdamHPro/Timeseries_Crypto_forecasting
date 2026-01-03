@@ -10,6 +10,27 @@ logger = logging.getLogger(__name__)
 db_config = pull_db_config()
 
 
+def get_db_connection():
+    try:
+        connection = psycopg2.connect(
+            user=db_config["user"],
+            password=db_config["pass"],
+            host=db_config["host"],
+            port=db_config["port"],
+            database=db_config["name"]
+        )
+        yield connection
+        connection.commit()
+    except Exception as e:
+        if connection:
+            connection.rollback()  # Rollback transaction on error
+        logger.error(f"Database transaction failed: {e}")
+        raise e
+    finally:
+        if connection:
+            connection.close()  # Always close the connection
+
+
 def get_latest_date_in_db():
     try:
         logger.info(
@@ -81,3 +102,32 @@ def update_db(data_path):
     except Exception as e:
         logger.error(f"Error while connecting to the database: {e}")
         return None
+
+
+def create_prediction_table():
+    """Crée la table pour stocker l'historique des prédictions."""
+    query = '''
+    CREATE TABLE IF NOT EXISTS predictions (
+        id SERIAL PRIMARY KEY,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        model_version VARCHAR(50),
+        predicted_return_pct NUMERIC
+    );
+    '''
+    with get_db_connection() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(query)
+            logger.info("Table 'predictions' checked/created.")
+
+
+def save_prediction(value):
+    """Sauvegarde une nouvelle prédiction."""
+    query = "INSERT INTO predictions (predicted_return_pct, model_version) VALUES (%s, %s);"
+    try:
+        with get_db_connection() as conn:
+            with conn.cursor() as cursor:
+                # On marque 'v1' pour l'instant, utile pour tes futures améliorations
+                cursor.execute(query, (float(value), 'xgboost_v1'))
+                logger.info(f"Prediction saved: {value}%")
+    except Exception as e:
+        logger.error(f"Failed to save prediction: {e}")
