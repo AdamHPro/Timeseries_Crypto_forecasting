@@ -20,6 +20,14 @@ output_dir = CURRENT_DIR.parent / "data_lake" / "btc_usd"
 
 
 def pipeline(init=False, output_dir=output_dir):
+    """
+    Main ETL pipeline function.
+    Args:
+        init (bool): Whether to initialize the database.
+        output_dir (Path): Directory to store data files.
+    Returns:
+        predicted_return (float): The predicted return from the model.
+    """
     logger.info("Starting ETL Pipeline...")
     if init:
         logger.info("Initializing database...")
