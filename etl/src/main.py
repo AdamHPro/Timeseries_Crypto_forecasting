@@ -1,7 +1,7 @@
 import logging
 from pathlib import Path
 from init_db import init_db
-from update_db import update_db, get_latest_date_in_db, save_permanent_backup_parquet
+from update_db import update_db, get_latest_date_in_db, save_permanent_backup_parquet, save_prediction, create_prediction_table
 from xgboost_training import training_task
 from data_fetching import pull_data_from_yfinance
 from datetime import datetime, timedelta
@@ -36,6 +36,8 @@ def pipeline(init=False, output_dir=output_dir):
     # Clean Data and Train XGBoost model and get prediction
     predicted_return = training_task(output_dir)
     logger.info("Pipeline completed successfully.")
+    create_prediction_table()  # Ensure prediction table exists
+    save_prediction(predicted_return[0])  # Save the predicted return to DB
     return predicted_return
 
 

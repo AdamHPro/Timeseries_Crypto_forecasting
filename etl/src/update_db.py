@@ -90,7 +90,6 @@ def update_db(data_path):
 
 
 def create_prediction_table():
-    """Crée la table pour stocker l'historique des prédictions."""
     query = '''
     CREATE TABLE IF NOT EXISTS predictions (
         id SERIAL PRIMARY KEY,
@@ -106,7 +105,6 @@ def create_prediction_table():
 
 
 def save_prediction(value):
-    """Sauvegarde une nouvelle prédiction."""
     query = "INSERT INTO predictions (predicted_return_pct, model_version) VALUES (%s, %s);"
     try:
         with get_db_connection() as conn:
