@@ -25,6 +25,9 @@ def save_to_parquet(df, output_dir, filename="btc_data.parquet"):
 
 
 def pull_data_from_yfinance(output_dir, start_date, end_date):
+    """
+    Pulls historical BTC-USD data from yfinance and saves it as a parquet file.
+    """
     try:
         logger.info(
             f"Fetching historical crypto data from yfinance from {start_date} to {end_date}...")
