@@ -15,6 +15,9 @@ db_config = pull_db_config()
 
 
 def init_db(start_date='2016-01-01'):
+    """
+    Initializes the PostgreSQL database with historical BTC-USD data from yfinance.
+    """
     df = pull_data_from_yfinance(
         start_date=start_date, end_date=formatted_date)
     filename = f"btc_data_{start_date}.parquet"
