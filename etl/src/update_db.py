@@ -13,6 +13,9 @@ db_config = pull_db_config()
 
 @contextmanager
 def get_db_connection():
+    """
+    Context manager for PostgreSQL database connection.
+    """
     try:
         connection = psycopg2.connect(
             user=db_config["user"],
@@ -34,6 +37,9 @@ def get_db_connection():
 
 
 def get_latest_date_in_db():
+    """
+    Fetches the latest trading date from the market_data table in the postgres database.
+    """
     try:
         logger.info(
             "Connecting to the PostgreSQL database to get the latest date...")
@@ -51,6 +57,9 @@ def get_latest_date_in_db():
 
 
 def save_permanent_backup_parquet(data_path, start_date, end_date):
+    """
+    Saves a permanent backup of the parquet file with a timestamped filename.
+    """
     filename = f"btc_data_{start_date}_{end_date}.parquet"
     logger.debug(
         f"Saving permanent backup parquet file from {data_path} as {filename}")
@@ -58,6 +67,9 @@ def save_permanent_backup_parquet(data_path, start_date, end_date):
 
 
 def update_db(data_path):
+    """
+    Updates the PostgreSQL database with new data from the parquet file.
+    """
     df = pd.read_parquet(data_path)
 
     try:
@@ -90,6 +102,9 @@ def update_db(data_path):
 
 
 def create_prediction_table():
+    """
+    Creates the predictions table if it does not exist.
+    """
     query = '''
     CREATE TABLE IF NOT EXISTS predictions (
         id SERIAL PRIMARY KEY,
@@ -105,6 +120,9 @@ def create_prediction_table():
 
 
 def save_prediction(value):
+    """
+    Saves the predicted return value into the predictions table.
+    """
     query = "INSERT INTO predictions (predicted_return_pct, model_version) VALUES (%s, %s);"
     try:
         with get_db_connection() as conn:
