@@ -15,6 +15,9 @@ logging.basicConfig(
 
 
 def extract_df(folder_data_lake):
+    """
+    Extracts data from a Parquet file in the data lake.
+    """
     logging.info("Extracting data from Parquet data lake...")
     table = pq.read_table(folder_data_lake)
     df = table.to_pandas()
@@ -25,6 +28,9 @@ def extract_df(folder_data_lake):
 
 
 def create_features_for_xgboost(df):
+    """
+    Creates features for the XGBoost model from the raw dataframe.
+    """
     logging.info("Creating features for XGBoost model...")
     # --- Step 0: Data Cleaning ---
     # Convert 'Date' to datetime objects and sort chronologically
@@ -86,6 +92,9 @@ def create_features_for_xgboost(df):
 
 
 def convert_to_float(df):
+    """
+    Converts price columns to float after removing commas and dollar signs.
+    """
     logging.info("Converting price columns to float...")
     for col in ['Close', 'High', 'Low', 'Open']:
         df[col] = df[col].astype(str).str.replace(',', '').str.replace('$', '')
@@ -94,6 +103,9 @@ def convert_to_float(df):
 
 
 def correct_data_types(df):
+    """
+    Corrects data types for price columns after removing commas and dollar signs.
+    """
     logging.info("Correcting data types for price columns...")
     df['Low'] = df['Low'].astype(str).str.replace(',', '').str.replace('$', '')
     df['Low'] = df['Low'].astype(float)
@@ -105,6 +117,9 @@ def correct_data_types(df):
 
 
 def train_xgboost_model(df, features_to_drop=['target', 'Open', 'High', 'Low']):
+    """
+    Trains an XGBoost model to predict future returns based on engineered features.
+    """
     logging.info("Training XGBoost model...")
     # We remove rows where 'target' is NaN (the last 7 days) because we can't learn from them.
     df_train = df.dropna(subset=['target'])
@@ -126,6 +141,9 @@ def train_xgboost_model(df, features_to_drop=['target', 'Open', 'High', 'Low']):
 
 
 def training_task(output_dir, features_to_drop=['target', 'Open', 'High', 'Low']):
+    """
+    Orchestrates the training task: data extraction, preprocessing, feature engineering, and model training.
+    """
     df = extract_df(output_dir)
     df = convert_to_float(df)
     df = correct_data_types(df)
