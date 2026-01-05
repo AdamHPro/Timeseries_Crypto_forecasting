@@ -4,15 +4,15 @@ import os
 import pandas as pd
 import psycopg2
 from psycopg2 import extras
-from config import pull_db_config
+from config import get_db_config
 from contextlib import contextmanager
 
 logger = logging.getLogger(__name__)
-db_config = pull_db_config()
+db_config = get_db_config()
 
 
 @contextmanager
-def get_db_connection():
+def get_db_connection(db_config=db_config):
     """
     Context manager for PostgreSQL database connection.
     """
@@ -36,14 +36,14 @@ def get_db_connection():
             connection.close()  # Always close the connection
 
 
-def get_latest_date_in_db():
+def get_latest_date_in_db(db_config=db_config):
     """
     Fetches the latest trading date from the market_data table in the postgres database.
     """
     try:
         logger.info(
             "Connecting to the PostgreSQL database to get the latest date...")
-        with get_db_connection() as connection:
+        with get_db_connection(db_config) as connection:
             with connection.cursor() as cursor:
                 query = "SELECT MAX(trading_date) FROM market_data;"
                 cursor.execute(query)
@@ -66,14 +66,14 @@ def save_permanent_backup_parquet(data_path, start_date, end_date):
     shutil.copy(data_path, os.path.join(os.path.dirname(data_path), filename))
 
 
-def update_db(data_path):
+def update_db(db_config=db_config, data_path=None):
     """
     Updates the PostgreSQL database with new data from the parquet file.
     """
     df = pd.read_parquet(data_path)
 
     try:
-        with get_db_connection() as connection:
+        with get_db_connection(db_config) as connection:
             with connection.cursor() as cursor:
                 df_clean = df.reset_index()
                 data_list = [tuple(x) for x in df_clean.to_numpy()]
@@ -101,7 +101,7 @@ def update_db(data_path):
         return None
 
 
-def create_prediction_table():
+def create_prediction_table(db_config=db_config):
     """
     Creates the predictions table if it does not exist.
     """
@@ -113,19 +113,19 @@ def create_prediction_table():
         predicted_return_pct NUMERIC
     );
     '''
-    with get_db_connection() as conn:
+    with get_db_connection(db_config) as conn:
         with conn.cursor() as cursor:
             cursor.execute(query)
             logger.info("Table 'predictions' checked/created.")
 
 
-def save_prediction(value):
+def save_prediction(db_config=db_config, value=None):
     """
     Saves the predicted return value into the predictions table.
     """
     query = "INSERT INTO predictions (predicted_return_pct, model_version) VALUES (%s, %s);"
     try:
-        with get_db_connection() as conn:
+        with get_db_connection(db_config) as conn:
             with conn.cursor() as cursor:
                 # On marque 'v1' pour l'instant, utile pour tes futures améliorations
                 cursor.execute(query, (float(value), 'xgboost_v1'))

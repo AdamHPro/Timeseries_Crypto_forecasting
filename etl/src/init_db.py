@@ -2,7 +2,7 @@ from datetime import datetime
 import logging
 import psycopg2
 from psycopg2 import extras
-from config import pull_db_config
+from config import get_db_config
 from data_fetching import pull_data_from_yfinance, save_to_parquet
 
 
@@ -11,10 +11,10 @@ logger = logging.getLogger(__name__)
 
 now = datetime.now()
 formatted_date = now.strftime("%Y-%m-%d")
-db_config = pull_db_config()
+db_config = get_db_config()
 
 
-def init_db(start_date='2016-01-01'):
+def init_db(db_config=db_config, start_date='2016-01-01'):
     """
     Initializes the PostgreSQL database with historical BTC-USD data from yfinance.
     """
@@ -70,7 +70,3 @@ def init_db(start_date='2016-01-01'):
         logger.error(f"Error while interacting with the database: {e}")
         return None
     return True
-
-
-if __name__ == "__main__":
-    init_db()

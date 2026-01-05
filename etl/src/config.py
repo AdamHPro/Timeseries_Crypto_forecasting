@@ -1,7 +1,7 @@
 import os
 
 
-def pull_db_config():
+def get_db_config():
     """
     Pulls database configuration from environment variables with default values.
     """
