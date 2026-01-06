@@ -4,6 +4,8 @@ import os
 def get_db_config():
     """
     Pulls database configuration from environment variables with default values.
+    Returns:
+        dict: A dictionary containing database connection parameters.
     """
     DB_HOST = os.getenv("DB_HOST", "localhost")
     DB_NAME = os.getenv("DB_NAME", "postgres")
