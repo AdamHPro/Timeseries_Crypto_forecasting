@@ -20,3 +20,14 @@ def get_db_config():
         "pass": DB_PASS,
         "port": DB_PORT
     }
+
+
+def get_origins():
+    """
+    Returns a list of allowed CORS origins.
+    Returns:
+        list: A list of allowed origins for CORS.
+    """
+    return [
+        os.getenv("VITE_API_URL", "http://localhost:8000"),
+    ]
