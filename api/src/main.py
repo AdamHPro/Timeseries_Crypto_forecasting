@@ -48,3 +48,52 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.get("/health", status_code=status.HTTP_200_OK)
+def health_check():
+    """
+    Simple health check to ensure the API is running.
+    """
+    return {"status": "ok", "message": "API is online"}
+
+
+@app.get("/predictions/latest", response_model=PredictionResponse)
+def get_latest_prediction():
+    """
+    Fetches the most recent prediction from the database.
+    """
+    query = """
+        SELECT id, predicted_return_pct as value, model_version, created_at 
+        FROM predictions 
+        ORDER BY created_at DESC 
+        LIMIT 1;
+    """
+
+    conn = None
+    try:
+        conn = get_db_connection()
+        with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(query)
+            result = cursor.fetchone()
+
+            if not result:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="No predictions found in the database."
+                )
+
+            # Convert timestamp to string for JSON serialization compatibility
+            result['created_at'] = str(result['created_at'])
+
+            return result
+
+    except psycopg2.Error as e:
+        logger.error(f"Database query error: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal Database Error"
+        )
+    finally:
+        if conn:
+            conn.close()
