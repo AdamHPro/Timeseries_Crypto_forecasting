@@ -5,3 +5,4 @@ postgres_data/
 data_lake/
 *.parquet
 __pycache__/
+.DS_Store

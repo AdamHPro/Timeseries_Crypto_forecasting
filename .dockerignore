@@ -6,3 +6,4 @@ postgres_data/
 data_lake/
 __pycache__/
 data_lake/*.*
+.DS_Store
