@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import psycopg2
 from psycopg2.extras import RealDictCursor
+from contextlib import contextmanager
 
 from config import get_db_config, get_origins
 
@@ -50,6 +51,31 @@ app.add_middleware(
 )
 
 
+@contextmanager
+def get_db_connection(db_config=db_config):
+    """
+    Context manager for PostgreSQL database connection.
+    """
+    try:
+        connection = psycopg2.connect(
+            user=db_config["user"],
+            password=db_config["pass"],
+            host=db_config["host"],
+            port=db_config["port"],
+            database=db_config["name"]
+        )
+        yield connection
+        connection.commit()
+    except Exception as e:
+        if connection:
+            connection.rollback()  # Rollback transaction on error
+        logger.error(f"Database transaction failed: {e}")
+        raise e
+    finally:
+        if connection:
+            connection.close()  # Always close the connection
+
+
 @app.get("/health", status_code=status.HTTP_200_OK)
 def health_check():
     """
@@ -72,10 +98,10 @@ def get_latest_prediction():
 
     conn = None
     try:
-        conn = get_db_connection()
-        with conn.cursor(cursor_factory=RealDictCursor) as cursor:
-            cursor.execute(query)
-            result = cursor.fetchone()
+        with get_db_connection() as conn:
+            with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+                cursor.execute(query)
+                result = cursor.fetchone()
 
             if not result:
                 raise HTTPException(
@@ -94,6 +120,3 @@ def get_latest_prediction():
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Internal Database Error"
         )
-    finally:
-        if conn:
-            conn.close()
