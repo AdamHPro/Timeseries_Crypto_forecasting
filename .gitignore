@@ -6,3 +6,4 @@ data_lake/
 *.parquet
 __pycache__/
 .DS_Store
+data_lake
