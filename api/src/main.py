@@ -120,3 +120,6 @@ def get_latest_prediction():
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Internal Database Error"
         )
+
+# Command to run the app from api/ folder :
+# python -m uvicorn src.main:app --reload
