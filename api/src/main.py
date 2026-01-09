@@ -1,6 +1,5 @@
 import logging
 from contextlib import asynccontextmanager
-from typing import Optional
 
 from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -9,7 +8,7 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 from contextlib import contextmanager
 
-from config import get_db_config, get_origins
+from src.config import get_db_config, get_origins
 
 
 logging.basicConfig(level=logging.INFO)
