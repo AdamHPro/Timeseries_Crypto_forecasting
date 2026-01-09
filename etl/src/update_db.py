@@ -16,6 +16,7 @@ def get_db_connection(db_config=db_config):
     """
     Context manager for PostgreSQL database connection.
     """
+    connection = None
     try:
         connection = psycopg2.connect(
             user=db_config["user"],

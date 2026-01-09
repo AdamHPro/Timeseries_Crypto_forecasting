@@ -23,6 +23,11 @@ services:
       - ./data_lake:/app/data_lake
     environment:
       DATABASE_URL: postgresql://${DB_USER}:${DB_PASS}@db:5432/${DB_NAME}
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
 
   #Fastapi service
   api:
