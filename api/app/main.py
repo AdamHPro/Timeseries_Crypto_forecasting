@@ -8,7 +8,7 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 from contextlib import contextmanager
 
-from src.config import get_db_config, get_origins
+from app.config import get_db_config, get_origins
 
 
 logging.basicConfig(level=logging.INFO)
