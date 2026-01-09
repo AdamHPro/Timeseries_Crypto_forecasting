@@ -1,6 +1,6 @@
 # etl/Dockerfile
 
-FROM python:3.13.0-slim
+FROM python:3.11.0-slim
 
 WORKDIR /app
 
