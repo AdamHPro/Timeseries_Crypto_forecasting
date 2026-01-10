@@ -19,7 +19,7 @@ logging.basicConfig(
 
 CURRENT_DIR = Path(__file__).resolve().parent.parent
 DATA_LAKE_PATH = CURRENT_DIR.parent / "data_lake" / "btc_usd"
-output_dir = os.getenv("DATA_LAKE_PATH", str(DATA_LAKE_PATH))
+output_dir = os.getenv("DATA_LAKE_PATH", DATA_LAKE_PATH)
 
 
 def pipeline(init=False, output_dir=output_dir):
