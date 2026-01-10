@@ -29,5 +29,5 @@ def get_origins():
         list: A list of allowed origins for CORS.
     """
     return [
-        os.getenv("REACT_API_URL"),
+        os.getenv("BACKEND_CORS_ORIGINS"),
     ]

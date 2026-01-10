@@ -48,7 +48,7 @@ services:
       DB_NAME: ${DB_NAME}
       DB_USER: ${DB_USER}
       DB_PASS: ${DB_PASS}
-      REACT_API_URL: ${REACT_API_URL}
+      BACKEND_CORS_ORIGINS: ${BACKEND_CORS_ORIGINS}
 
   #Frontend React
   front:
