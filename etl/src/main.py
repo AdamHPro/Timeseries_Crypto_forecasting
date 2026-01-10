@@ -1,4 +1,5 @@
 import logging
+import os
 from pathlib import Path
 from config import get_db_config
 from init_db import init_db
@@ -17,7 +18,8 @@ logging.basicConfig(
 )
 
 CURRENT_DIR = Path(__file__).resolve().parent.parent
-output_dir = CURRENT_DIR.parent / "data_lake" / "btc_usd"
+DATA_LAKE_PATH = CURRENT_DIR.parent / "data_lake" / "btc_usd"
+output_dir = os.getenv("DATA_LAKE_PATH", str(DATA_LAKE_PATH))
 
 
 def pipeline(init=False, output_dir=output_dir):
