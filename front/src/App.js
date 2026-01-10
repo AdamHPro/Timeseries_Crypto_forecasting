@@ -14,6 +14,7 @@ function App() {
 
     try {
       const response = await fetch(`${API_URL}/predictions/latest`);
+      console.log("Response:", response);
 
       if (!response.ok) {
         throw new Error("Impossible de récupérer la prédiction");

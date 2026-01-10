@@ -29,5 +29,5 @@ def get_origins():
         list: A list of allowed origins for CORS.
     """
     return [
-        os.getenv("VITE_API_URL", "http://localhost:8000"),
+        os.getenv("REACT_API_URL"),
     ]

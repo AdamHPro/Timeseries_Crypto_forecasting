@@ -48,6 +48,7 @@ services:
       DB_NAME: ${DB_NAME}
       DB_USER: ${DB_USER}
       DB_PASS: ${DB_PASS}
+      REACT_API_URL: ${REACT_API_URL}
 
   #Frontend React
   front:
@@ -61,4 +62,4 @@ services:
       - /app/node_modules
     environment:
       # The API URL for React to make its fetch() requests
-      VITE_API_URL: ${VITE_API_URL}
+      REACT_API_URL: ${REACT_API_URL}
