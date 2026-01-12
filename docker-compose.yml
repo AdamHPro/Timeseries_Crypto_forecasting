@@ -62,4 +62,4 @@ services:
       - /app/node_modules
     environment:
       # The API URL for React to make its fetch() requests
-      REACT_API_URL: ${REACT_API_URL}
+      REACT_APP_API_URL: ${REACT_APP_API_URL}
