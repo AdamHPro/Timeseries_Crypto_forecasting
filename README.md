@@ -59,3 +59,13 @@ The architecture of the project consists of the following components:
 4. Frontend Interface: React.js application to provide a user-friendly interface for interacting with the model and visualizing predictions. (/front)
 
 5. Database: PostgreSQL database to store historical cryptocurrency data and model predictions. (db)
+
+## How to run the project
+
+1. Clone the repository:
+
+   ```bash
+   git clone
+
+    cd Timeseries_Cryptos_forecasting
+   ```
