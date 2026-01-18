@@ -69,3 +69,9 @@ The architecture of the project consists of the following components:
 
     cd Timeseries_Cryptos_forecasting
    ```
+
+2. Build and run the Docker containers:
+
+   ```bash
+   docker-compose up --build
+   ```
