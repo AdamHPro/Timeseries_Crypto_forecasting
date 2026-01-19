@@ -75,3 +75,12 @@ The architecture of the project consists of the following components:
    ```bash
    docker-compose up --build
    ```
+
+3. Access the frontend application at `http://localhost:3000`.
+4. Access the FastAPI documentation at `http://localhost:8000/docs`.
+5. Use the API endpoints to get cryptocurrency price predictions.
+6. Stop the Docker containers when done:
+
+   ```bash
+   docker-compose down
+   ```
