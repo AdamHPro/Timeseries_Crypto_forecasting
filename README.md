@@ -16,10 +16,24 @@ The project have a dataset of a crypto as an input, the period of time analyse, 
 - TensorFlow/Keras
 - Jupyter Notebook
 - Frontend: React.js
-- Orchestration: Airflow
+- Orchestration: Flask
 - Database: PostgreSQL
 - Deployment: Docker
 - Version Control: Git/GitHub
+- Cloud: AWS/GCP
+
+## Learning objectives
+
+- Understand the fundamentals of time series analysis and forecasting.
+- Gain hands-on experience with LSTM neural networks for time series prediction.
+- Learn to preprocess and visualize time series data.
+- Develop skills in building and deploying machine learning models using Python and relevant libraries.
+- Explore the application of deep learning techniques in financial markets, specifically cryptocurrency price prediction.
+- Advise on best practices for model evaluation and performance tuning in time series forecasting tasks.
+- Understand the challenges and considerations when working with cryptocurrency data, such as volatility and market trends.
+- Gain experience in integrating machine learning models into web applications for real-time predictions.
+- Learn to use Docker for containerization and deployment of machine learning applications.
+- Explore cloud platforms for hosting and scaling machine learning applications.
 
 ## Project Duration
 
