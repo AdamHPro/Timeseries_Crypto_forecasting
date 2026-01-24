@@ -2,7 +2,7 @@ import logging
 import os
 from pathlib import Path
 from config import get_db_config
-from init_db import init_db
+from init_db import init_db, verify_db_tables
 from update_db import update_db, get_latest_date_in_db, save_permanent_backup_parquet, save_prediction, create_prediction_table
 from xgboost_training import training_task
 from data_fetching import pull_data_from_yfinance
@@ -22,7 +22,7 @@ DATA_LAKE_PATH = CURRENT_DIR.parent / "data_lake" / "btc_usd"
 output_dir = os.getenv("DATA_LAKE_PATH", DATA_LAKE_PATH)
 
 
-def pipeline(init=False, output_dir=output_dir):
+def pipeline(output_dir=output_dir):
     """
     Main ETL pipeline function.
     Args:
@@ -32,9 +32,9 @@ def pipeline(init=False, output_dir=output_dir):
         predicted_return (float): The predicted return from the model.
     """
     logger.info("Starting ETL Pipeline...")
-    if init:
+    if verify_db_tables() is False:
         logger.info("Initializing database...")
-        init_db()
+        init_db(output_dir)
     logger.info("Updating database with new data...")
     db_config = get_db_config()
     start_date = get_latest_date_in_db(db_config)  # Get latest date from DB

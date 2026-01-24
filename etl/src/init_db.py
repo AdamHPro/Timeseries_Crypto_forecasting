@@ -14,14 +14,41 @@ formatted_date = now.strftime("%Y-%m-%d")
 db_config = get_db_config()
 
 
-def init_db(db_config=db_config, start_date='2016-01-01'):
+def verify_db_tables(db_config=db_config, table_name="market_data"):
+    """
+    Verifies the connection to the PostgreSQL database.
+    """
+    try:
+        connection = psycopg2.connect(
+            user=db_config["user"],
+            password=db_config["pass"],
+            host=db_config["host"],
+            port=db_config["port"],
+            database=db_config["name"]
+        )
+        cursor = connection.cursor()
+        cursor.execute(f"SELECT to_regclass('{table_name}');")
+        result = cursor.fetchone()
+        if result[0] is None:
+            logger.warning(
+                f"Table '{table_name}' does not exist in the database.")
+            return False
+        else:
+            logger.info(f"Table '{table_name}' exists in the database.")
+            return True
+    except Exception as e:
+        logger.error(f"Error while verifying table existence: {e}")
+        return False
+
+
+def init_db(output_dir, db_config=db_config, start_date='2016-01-01'):
     """
     Initializes the PostgreSQL database with historical BTC-USD data from yfinance.
     """
-    df = pull_data_from_yfinance(
-        start_date=start_date, end_date=formatted_date)
+    df = pull_data_from_yfinance(output_dir,
+                                 start_date=start_date, end_date=formatted_date)
     filename = f"btc_data_{start_date}.parquet"
-    save_to_parquet(df, filename=filename)
+    save_to_parquet(df, output_dir, filename=filename)
 
     try:
         logger.info("Connecting to the PostgreSQL database...")
