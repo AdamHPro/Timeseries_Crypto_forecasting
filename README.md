@@ -60,8 +60,6 @@ The architecture of the project consists of the following components:
 
 5. Database: PostgreSQL database to store historical cryptocurrency data and model predictions. (db)
 
-6. Orchestration: Using Airflow to schedule and manage the ETL processes and model training. (Being implemented)
-
 ## How to run the project
 
 1. Clone the repository:
