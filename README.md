@@ -6,6 +6,24 @@ The goal is to know the best day in a month to buy a cryptocurrency in order to 
 
 The project have a dataset of a crypto as an input, the period of time analyse, and the model will output the best day to buy the crypto in order to maximize profit in that window of time.
 
+## Run the project:
+
+1. Clone the repository:
+
+   ```bash
+   git clone
+      cd Timeseries_Crypto_forecasting
+   ```
+
+2. copy the .env.example to .env
+3. Build and run the Docker containers:
+
+   ```bash
+   docker-compose up --build
+   ```
+
+4. Access the frontend application at `http://localhost:3000`.
+
 ## Stack
 
 - Backend: Python
@@ -59,28 +77,3 @@ The architecture of the project consists of the following components:
 4. Frontend Interface: React.js application to provide a user-friendly interface for interacting with the model and visualizing predictions. (/front)
 
 5. Database: PostgreSQL database to store historical cryptocurrency data and model predictions. (db)
-
-## How to run the project
-
-1. Clone the repository:
-
-   ```bash
-   git clone
-
-    cd Timeseries_Cryptos_forecasting
-   ```
-
-2. Build and run the Docker containers:
-
-   ```bash
-   docker-compose up --build
-   ```
-
-3. Access the frontend application at `http://localhost:3000`.
-4. Access the FastAPI documentation at `http://localhost:8000/docs`.
-5. Use the API endpoints to get cryptocurrency price predictions.
-6. Stop the Docker containers when done:
-
-   ```bash
-   docker-compose down
-   ```
