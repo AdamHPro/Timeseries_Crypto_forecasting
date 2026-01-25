@@ -2,7 +2,7 @@ import logging
 import os
 from pathlib import Path
 from config import get_db_config
-from init_db import init_db, verify_db_tables
+from init_db import init_db, verify_db
 from update_db import update_db, get_latest_date_in_db, save_permanent_backup_parquet, save_prediction, create_prediction_table
 from xgboost_training import training_task
 from data_fetching import pull_data_from_yfinance
@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
+    format='%(asctime)s | %(filename)s:%(lineno)d | %(funcName)s | %(levelname)s | %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S',
     force=True
 )
@@ -26,13 +26,12 @@ def pipeline(output_dir=output_dir):
     """
     Main ETL pipeline function.
     Args:
-        init (bool): Whether to initialize the database.
         output_dir (Path): Directory to store data files.
     Returns:
         predicted_return (float): The predicted return from the model.
     """
     logger.info("Starting ETL Pipeline...")
-    if verify_db_tables() is False:
+    if verify_db() is False:
         logger.info("Initializing database...")
         init_db(output_dir)
     logger.info("Updating database with new data...")
