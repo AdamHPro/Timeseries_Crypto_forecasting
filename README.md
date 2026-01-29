@@ -15,7 +15,12 @@ The project have a dataset of a crypto as an input, the period of time analyse, 
       cd Timeseries_Crypto_forecasting
    ```
 
-2. copy the .env.example to .env
+2. copy the .env.example to .env (and modify the variables if needed):
+
+   ```bash
+   cp .env.example .env
+   ```
+
 3. Build and run the Docker containers:
 
    ```bash
