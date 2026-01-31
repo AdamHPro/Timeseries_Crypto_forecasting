@@ -1,5 +1,4 @@
 from airflow import DAG
-from airflow.operators.python import PythonOperator
 from datetime import datetime, timedelta
 
 # Best Practice 1: Define default_args to handle failures automatically.
@@ -53,25 +52,4 @@ with DAG(
     catchup=False,
     tags=['learning', 'daily'],
 ) as dag:
-
-    # Task 1: Extraction
-    t1 = PythonOperator(
-        task_id='extract_task',
-        python_callable=extract_data,
-    )
-
-    # Task 2: Transformation
-    t2 = PythonOperator(
-        task_id='transform_task',
-        python_callable=transform_data,
-    )
-
-    # Task 3: Loading
-    t3 = PythonOperator(
-        task_id='load_task',
-        python_callable=load_data,
-    )
-
-    # Best Practice 4: Define dependencies clearly at the end.
-    # t1 runs first, then t2, then t3.
-    t1 >> t2 >> t3
+    pass
