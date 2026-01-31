@@ -15,6 +15,8 @@ default_args = {
 
 # Best Practice 2: Separation of concerns.
 # Ideally, these functions connect to external services (APIs, Databases).
+
+
 # For now, we simulate data processing.
 
 
