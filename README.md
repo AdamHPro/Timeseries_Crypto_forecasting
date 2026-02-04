@@ -35,11 +35,10 @@ Building an ETL with an API and a Frontend to use a timeseries forecasting model
 - TensorFlow/Keras
 - Jupyter Notebook
 - Frontend: React.js
-- Orchestration: Flask
+- Orchestration: Airflow
 - Database: PostgreSQL
 - Deployment: Docker
 - Version Control: Git/GitHub
-- Cloud: AWS/GCP
 
 ## Learning objectives
 
