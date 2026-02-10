@@ -9,3 +9,4 @@ __pycache__/
 data_lake
 airflow_db_data/
 logs/
+.vscode
