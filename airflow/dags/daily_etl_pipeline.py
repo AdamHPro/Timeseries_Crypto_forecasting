@@ -1,6 +1,26 @@
 import pendulum
 from airflow.decorators import dag, task
 
+# Pipeline imports
+import logging
+import os
+from pathlib import Path
+from etl.src.config import get_db_config
+from etl.src.init_db import init_db
+from etl.src.update_db import update_db, get_latest_date_in_db, save_permanent_backup_parquet, save_prediction, create_prediction_table
+from etl.src.xgboost_training import training_task
+from etl.src.data_fetching import pull_data_from_yfinance
+from datetime import datetime, timedelta
+
+logger = logging.getLogger(__name__)
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S',
+    force=True
+)
+
 # Default arguments for the DAG (retries, owner, etc.)
 default_args = {
     'owner': 'me',
