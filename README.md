@@ -25,8 +25,6 @@ Building an ETL with an API and a Frontend to use a timeseries forecasting model
 
 4. Access the frontend application at `http://localhost:3000`.
 
-5. Access the API documentation at `http://localhost:8000/docs`.
-
 ## Stack
 
 - Backend: Python
