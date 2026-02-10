@@ -21,6 +21,11 @@ logging.basicConfig(
     force=True
 )
 
+CURRENT_DIR = Path(__file__).resolve().parent.parent
+DATA_LAKE_PATH = CURRENT_DIR.parent / "data_lake" / "btc_usd"
+output_dir = os.getenv("DATA_LAKE_PATH", DATA_LAKE_PATH)
+
+
 # Default arguments for the DAG (retries, owner, etc.)
 default_args = {
     'owner': 'me',
