@@ -1,55 +1,56 @@
-from airflow import DAG
-from datetime import datetime, timedelta
+import pendulum
+from airflow.decorators import dag, task
 
-# Best Practice 1: Define default_args to handle failures automatically.
-# This prevents you from waking up at 3 AM if a task fails once due to a network glitch.
+# Default arguments for the DAG (retries, owner, etc.)
 default_args = {
-    'owner': 'moi',
-    'depends_on_past': False,
-    'email_on_failure': False,
-    'email_on_retry': False,
-    'retries': 2,                        # Retry the task twice before marking as failed
-    'retry_delay': timedelta(minutes=5),  # Wait 5 minutes between retries
+    'owner': 'me',
+    'retries': 1,
+    'retry_delay': pendulum.duration(minutes=5),
 }
 
-# Best Practice 2: Separation of concerns.
-# Ideally, these functions connect to external services (APIs, Databases).
+# Define the DAG context
+# schedule_interval: Here it runs daily at 6 AM. Use None for manual trigger only.
+# catchup=False: Critical! Prevents Airflow from running all non-triggered past dates.
 
 
-# For now, we simulate data processing.
-
-
-def extract_data():
-    """Simulates extracting data from a source (e.g., API or CSV)."""
-    print("Extracting data...")
-    return "raw_data"
-
-
-def transform_data(ti):
-    """
-    Simulates cleaning the data.
-    'ti' is the Task Instance, used to pull data from the previous task (XComs).
-    """
-    raw_data = ti.xcom_pull(task_ids='extract_task')
-    print(f"Transforming {raw_data}...")
-    return "clean_data"
-
-
-def load_data(ti):
-    """Simulates loading data into a destination (e.g., Postgres, Snowflake)."""
-    clean_data = ti.xcom_pull(task_ids='transform_task')
-    print(f"Loading {clean_data} into the database.")
-
-
-# Best Practice 3: Use the Context Manager (with DAG(...) as dag) for cleaner code.
-with DAG(
-    'mon_premier_dag_quotidien',
+@dag(
+    dag_id='mon_premier_etl_moderne',
     default_args=default_args,
-    description='A simple daily pipeline for upskilling',
-    schedule_interval='@daily',       # Runs once a day at midnight
-    start_date=datetime(2024, 1, 1),  # The date execution technically starts
-    # CRITICAL: Prevents running all missed days since 2024 if you start today
+    start_date=pendulum.datetime(2023, 1, 1, tz="UTC"),
+    schedule_interval='0 6 * * *',
     catchup=False,
-    tags=['learning', 'daily'],
-) as dag:
-    pass
+    tags=['etl', 'learning']
+)
+def etl_pipeline():
+
+    # 1. Extract Task
+    @task()
+    def extract_data():
+        # Simulate extraction logic
+        raw_data = {"id": 1, "amount": 100, "currency": "USD"}
+        print(f"Extracted: {raw_data}")
+        return raw_data
+
+    # 2. Transform Task
+    # Airflow automatically handles data passing (XComs) between tasks
+    @task()
+    def transform_data(data: dict):
+        data['amount_eur'] = data['amount'] * 0.92
+        print(f"Transformed: {data}")
+        return data
+
+    # 3. Load Task
+    @task()
+    def load_data(data: dict):
+        print(f"Loading data to database: {data}")
+        # Insert logic here
+        return "Success"
+
+    # Define dependencies explicitly using function calls
+    raw = extract_data()
+    clean = transform_data(raw)
+    load_data(clean)
+
+
+# Instantiate the DAG
+dag_instance = etl_pipeline()
