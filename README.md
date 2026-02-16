@@ -48,7 +48,6 @@ Building an ETL with an API and a Frontend to use a timeseries forecasting model
 - Understand the challenges and considerations when working with cryptocurrency data, such as volatility and market trends.
 - Gain experience in integrating machine learning models into web applications for real-time predictions.
 - Learn to use Docker for containerization and deployment of machine learning applications.
-- Explore cloud platforms for hosting and scaling machine learning applications.
 
 ## Project Duration
 
