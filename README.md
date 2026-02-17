@@ -43,8 +43,6 @@ Building an ETL with an API and a Frontend to use a timeseries forecasting model
 - Gain hands-on experience with LSTM neural networks for time series prediction.
 - Learn to preprocess and visualize time series data.
 - Develop skills in building and deploying machine learning models using Python and relevant libraries.
-- Explore the application of deep learning techniques in financial markets, specifically cryptocurrency price prediction.
-- Advise on best practices for model evaluation and performance tuning in time series forecasting tasks.
 - Understand the challenges and considerations when working with cryptocurrency data, such as volatility and market trends.
 - Gain experience in integrating machine learning models into web applications for real-time predictions.
 - Learn to use Docker for containerization and deployment of machine learning applications.
