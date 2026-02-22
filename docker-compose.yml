@@ -10,11 +10,21 @@ services:
     volumes:
       # PERSISTENCE: Data is stored in postgres_data folder on host
       - ./postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      # Check if PostgreSQL is ready to accept connections
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      # Wait 5 seconds between each check
+      interval: 5s
+      # Maximum time allowed for a single check to run
+      timeout: 5s
+      # Number of consecutive failures needed to mark the container as unhealthy
+      retries: 5
 
   etl:
     build: ./etl
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     volumes:
       #To dev without relaunch
       - ./etl:/app
