@@ -99,6 +99,7 @@ services:
   # 3. Le Webserver (L'interface graphique)
   airflow-webserver:
     image: apache/airflow:2.8.1
+    command: webserver
     restart: always
     depends_on:
       airflow-postgres:
