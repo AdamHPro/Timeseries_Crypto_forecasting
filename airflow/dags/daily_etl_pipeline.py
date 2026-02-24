@@ -14,13 +14,6 @@ from datetime import datetime, timedelta
 
 logger = logging.getLogger(__name__)
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S',
-    force=True
-)
-
 CURRENT_DIR = Path(__file__).resolve().parent.parent
 DATA_LAKE_PATH = CURRENT_DIR.parent / "data_lake" / "btc_usd"
 output_dir = os.getenv("DATA_LAKE_PATH", DATA_LAKE_PATH)
@@ -50,6 +43,7 @@ def finance_ml_pipeline():
 
     @task(multiple_outputs=True)
     def extract_data(output_dir: str) -> str:
+        logging.getLogger("src").parent = logging.getLogger("airflow.task")
         # Get database configuration
         db_config = get_db_config()
         
@@ -71,6 +65,7 @@ def finance_ml_pipeline():
 
     @task
     def backup_to_parquet(data_path: str, start_date: str, end_date: str):
+        logging.getLogger("src").parent = logging.getLogger("airflow.task")
         # Save permanent backup in parquet
         logger.info(f"Backing up data from {data_path} for dates {start_date} to {end_date}")
         # Assuming your function can extract dates from the data or path
@@ -78,6 +73,7 @@ def finance_ml_pipeline():
 
     @task
     def load_to_db(data_path: str):
+        logging.getLogger("src").parent = logging.getLogger("airflow.task")
         # Update DB with new data (from parquet to postgres)
         db_config = get_db_config()
         logger.info("Loading new data to database...")
@@ -85,6 +81,7 @@ def finance_ml_pipeline():
 
     @task
     def train_xgboost(output_dir: str) -> float:
+        logging.getLogger("src").parent = logging.getLogger("airflow.task")
         # Clean Data and Train XGBoost model and get prediction
         logger.info("Training XGBoost model...")
         predicted_return = training_task(output_dir)
@@ -94,6 +91,7 @@ def finance_ml_pipeline():
 
     @task
     def save_model_prediction(prediction: float):
+        logging.getLogger("src").parent = logging.getLogger("airflow.task")
         # Ensure prediction table exists and save the predicted return
         db_config = get_db_config()
         create_prediction_table(db_config)
