@@ -2,8 +2,8 @@ from datetime import datetime
 import logging
 import psycopg2
 from psycopg2 import extras
-from config import get_db_config
-from data_fetching import pull_data_from_yfinance, save_to_parquet
+from src.config import get_db_config
+from src.data_fetching import pull_data_from_yfinance, save_to_parquet
 
 
 logger = logging.getLogger(__name__)
