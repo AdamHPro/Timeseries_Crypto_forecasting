@@ -15,12 +15,15 @@ services:
     build: ./etl
     depends_on:
       - db
+    working_dir: /app
+    command: ["python", "-m", "src.main"]
     volumes:
       #To dev without relaunch
       - ./etl:/app
       # SHARED: To deposit the trained model
       - ./shared_models:/app/models
       - ./data_lake:/app/data_lake
+
     environment:
       DATABASE_URL: postgresql://${DB_USER}:${DB_PASS}@db:5432/${DB_NAME}
       DB_HOST: db
@@ -68,26 +71,26 @@ services:
 
   # 1. Base de données dédiée à Airflow (Isolation = Bonne pratique)
   airflow-postgres:
-    image: postgres:13
+    image: postgres:15
     environment:
-      - POSTGRES_USER=airflow
-      - POSTGRES_PASSWORD=airflow
-      - POSTGRES_DB=airflow
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_DB: airflow
     volumes:
       - ./airflow_db_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "airflow"]
+      test: ["CMD", "pg_isready", "-U", "${DB_USER}"]
       interval: 5s
       retries: 5
 
   # 2. Initialisation (Lance les migrations SQL une seule fois)
   airflow-init:
-    image: apache/airflow:2.8.1
+    build: ./airflow
     depends_on:
       airflow-postgres:
         condition: service_healthy
     environment:
-      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@airflow-postgres/airflow
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://${DB_USER}:${DB_PASS}@airflow-postgres:5432/airflow
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
     command: version
     entrypoint: >
@@ -98,7 +101,7 @@ services:
 
   # 3. Le Webserver (L'interface graphique)
   airflow-webserver:
-    image: apache/airflow:2.8.1
+    build: ./airflow
     command: webserver
     restart: always
     depends_on:
@@ -107,9 +110,10 @@ services:
       airflow-init:
         condition: service_completed_successfully
     environment:
-      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@airflow-postgres/airflow
-      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
-      - AIRFLOW__CORE__LOAD_EXAMPLES=False # Pour garder ton interface propre
+      PYTHONPATH: /opt/airflow
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${DB_USER}:${DB_PASS}@airflow-postgres:5432/airflow
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__LOAD_EXAMPLES: False # Pour garder ton interface propre
     ports:
       - "8080:8080"
     volumes:
@@ -122,7 +126,7 @@ services:
 
   # 4. Le Scheduler (Le cœur qui décide quand lancer les tâches)
   airflow-scheduler:
-    image: apache/airflow:2.8.1
+    build: ./airflow
     command: scheduler
     restart: always
     depends_on:
@@ -131,9 +135,15 @@ services:
       airflow-init:
         condition: service_completed_successfully
     environment:
-      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@airflow-postgres/airflow
-      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
-      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      PYTHONPATH: /opt/airflow/etl
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${DB_USER}:${DB_PASS}@airflow-postgres:5432/airflow
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__LOAD_EXAMPLES: False
+      DB_HOST: airflow-postgres
+      DB_PORT: 5432
+      DB_NAME: airflow
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
     volumes:
       - ./airflow/dags:/opt/airflow/dags
       - ./airflow/logs:/opt/airflow/logs
