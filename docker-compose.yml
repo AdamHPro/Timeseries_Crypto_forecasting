@@ -122,6 +122,7 @@ services:
   # 4. Le Scheduler (Le cœur qui décide quand lancer les tâches)
   airflow-scheduler:
     image: apache/airflow:2.8.1
+    command: scheduler
     restart: always
     depends_on:
       airflow-postgres:
