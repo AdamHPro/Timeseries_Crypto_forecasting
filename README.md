@@ -30,7 +30,6 @@ Building an ETL with an API and a Frontend to use a timeseries forecasting model
 - Backend: Python
 - Pandas
 - Scikit-learn
-- TensorFlow/Keras
 - Frontend: React.js
 - Orchestration: Airflow
 - Database: PostgreSQL
