@@ -2,7 +2,7 @@ import logging
 import os
 from pathlib import Path
 from src.config import get_db_config
-from src.init_db import init_db
+from src.init_db import init_db, verify_db
 from src.update_db import update_db, get_latest_date_in_db, save_permanent_backup_parquet, save_prediction, create_prediction_table
 from src.xgboost_training import training_task
 from src.data_fetching import pull_data_from_yfinance

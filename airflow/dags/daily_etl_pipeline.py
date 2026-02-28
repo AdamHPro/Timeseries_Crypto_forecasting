@@ -6,16 +6,17 @@ import logging
 import os
 from pathlib import Path
 from src.config import get_db_config
-from src.init_db import init_db
+from src.init_db import init_db, verify_db
 from src.update_db import update_db, get_latest_date_in_db, save_permanent_backup_parquet, save_prediction, create_prediction_table
 from src.xgboost_training import training_task
 from src.data_fetching import pull_data_from_yfinance
+
 from datetime import datetime, timedelta
 
 logger = logging.getLogger(__name__)
 
 CURRENT_DIR = Path(__file__).resolve().parent.parent
-DATA_LAKE_PATH = CURRENT_DIR.parent / "data_lake" / "btc_usd"
+DATA_LAKE_PATH = CURRENT_DIR / "data_lake" / "btc_usd"
 output_dir = os.getenv("DATA_LAKE_PATH", DATA_LAKE_PATH)
 
 
@@ -41,6 +42,14 @@ default_args = {
 )
 def finance_ml_pipeline():
 
+    @task
+    def init_db_if_necessary(output_dir: str) -> str:
+        db_config = get_db_config()
+        if verify_db(db_config) is False:
+            logger.info("Initializing database...")
+            init_db(output_dir)
+        return str(output_dir)  # Pass the output_dir to the next task
+
     @task(multiple_outputs=True)
     def extract_data(output_dir: str) -> str:
         logging.getLogger("src").parent = logging.getLogger("airflow.task")
@@ -59,6 +68,7 @@ def finance_ml_pipeline():
         # Return the path so downstream tasks can use it via XCom
         return {
                 'data_path': data_path,
+                'output_dir': output_dir,
                 'start_date': start_date,
                 'end_date': end_date
             }
@@ -87,7 +97,7 @@ def finance_ml_pipeline():
         predicted_return = training_task(output_dir)
         
         # Return only the float value for the next task
-        return predicted_return[0]
+        return float(predicted_return[0])
 
     @task
     def save_model_prediction(prediction: float):
@@ -102,8 +112,9 @@ def finance_ml_pipeline():
     
     # Define output directory variable (could also be an Airflow Variable)
     output_directory = "/path/to/your/output"
-
+    output_dir = str(os.getenv("DATA_LAKE_PATH", DATA_LAKE_PATH))
     # 1. Extract data
+    output_dir = init_db_if_necessary(output_dir)  # Ensure DB is initialized before extraction
     extracted_data = extract_data(output_dir)
 
     # 2. Parallel tasks: Backup and Database Load
@@ -117,7 +128,7 @@ def finance_ml_pipeline():
 
     # 3. Train the model
     # We pass the output_dir, but we must ensure it runs AFTER the database is loaded
-    model_prediction = train_xgboost(output_dir=extracted_data['data_path'])
+    model_prediction = train_xgboost(output_dir=extracted_data['output_dir'])
 
     # 4. Save the prediction
     final_save = save_model_prediction(model_prediction)
