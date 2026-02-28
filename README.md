@@ -1,21 +1,50 @@
 # Timeseries_Cryptos_forecasting
 
-Building a timeseries forecasting model to predict cryptocurrency prices using LSTM (Long Short-Term Memory) neural networks.
+Building an ETL with an API and a Frontend to use a timeseries forecasting model to predict cryptocurrency prices.
+
+## Run the project:
+
+1. Clone the repository:
+
+   ```bash
+   git clone
+      cd Timeseries_Crypto_forecasting
+   ```
+
+2. copy the .env.example to .env (and modify the variables if needed):
+
+   ```bash
+   cp .env.example .env
+   ```
+
+3. Build and run the Docker containers:
+
+   ```bash
+   docker-compose up --build
+   ```
+
+4. Access the frontend application at `http://localhost:3000`.
 
 ## Stack
 
 - Backend: Python
 - Pandas
-- Numpy
-- Matplotlib
 - Scikit-learn
-- TensorFlow/Keras
-- Jupyter Notebook
 - Frontend: React.js
 - Orchestration: Airflow
 - Database: PostgreSQL
 - Deployment: Docker
 - Version Control: Git/GitHub
+
+## Learning objectives
+
+- Understand the fundamentals of time series analysis and forecasting.
+- Gain hands-on experience with LSTM neural networks for time series prediction.
+- Learn to preprocess and visualize time series data.
+- Develop skills in building and deploying machine learning models using Python and relevant libraries.
+- Understand the challenges and considerations when working with cryptocurrency data, such as volatility and market trends.
+- Gain experience in integrating machine learning models into web applications for real-time predictions.
+- Learn to use Docker for containerization and deployment of machine learning applications.
 
 ## Project Duration
 
@@ -41,30 +70,3 @@ The architecture of the project consists of the following components:
 4. Frontend Interface: React.js application to provide a user-friendly interface for interacting with the model and visualizing predictions. (/front)
 
 5. Database: PostgreSQL database to store historical cryptocurrency data and model predictions. (db)
-
-6. Orchestration: Using Airflow to schedule and manage the ETL processes and model training. (Being implemented)
-
-## How to run the project
-
-1. Clone the repository:
-
-   ```bash
-   git clone
-
-    cd Timeseries_Cryptos_forecasting
-   ```
-
-2. Build and run the Docker containers:
-
-   ```bash
-   docker-compose up --build
-   ```
-
-3. Access the frontend application at `http://localhost:3000`.
-4. Access the FastAPI documentation at `http://localhost:8000/docs`.
-5. Use the API endpoints to get cryptocurrency price predictions.
-6. Stop the Docker containers when done:
-
-   ```bash
-   docker-compose down
-   ```
