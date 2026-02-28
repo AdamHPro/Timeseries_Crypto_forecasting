@@ -22,12 +22,15 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    working_dir: /app
+    command: ["python", "-m", "src.main"]
     volumes:
       #To dev without relaunch
       - ./etl:/app
       # SHARED: To deposit the trained model
       - ./shared_models:/app/models
       - ./data_lake:/app/data_lake
+
     environment:
       DATABASE_URL: postgresql://${DB_USER}:${DB_PASS}@db:5432/${DB_NAME}
       DB_HOST: db
@@ -70,3 +73,87 @@ services:
     environment:
       # The API URL for React to make its fetch() requests
       REACT_APP_API_URL: ${REACT_APP_API_URL}
+
+  # --- INFRASTRUCTURE AIRFLOW (DÉBUT) ---
+
+  # 1. Base de données dédiée à Airflow (Isolation = Bonne pratique)
+  airflow-postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_DB: airflow
+    volumes:
+      - ./airflow_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${DB_USER}"]
+      interval: 5s
+      retries: 5
+
+  # 2. Initialisation (Lance les migrations SQL une seule fois)
+  airflow-init:
+    build: ./airflow
+    depends_on:
+      airflow-postgres:
+        condition: service_healthy
+    environment:
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://${DB_USER}:${DB_PASS}@airflow-postgres:5432/airflow
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+    command: version
+    entrypoint: >
+      /bin/bash -c "
+      airflow db init &&
+      airflow users create --role Admin --username admin --email admin@example.com --firstname Admin --lastname User --password admin
+      "
+
+  # 3. Le Webserver (L'interface graphique)
+  airflow-webserver:
+    build: ./airflow
+    command: webserver
+    restart: always
+    depends_on:
+      airflow-postgres:
+        condition: service_healthy
+      airflow-init:
+        condition: service_completed_successfully
+    environment:
+      PYTHONPATH: /opt/airflow
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${DB_USER}:${DB_PASS}@airflow-postgres:5432/airflow
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__LOAD_EXAMPLES: False # Pour garder ton interface propre
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/logs:/opt/airflow/logs
+      - ./airflow/plugins:/opt/airflow/plugins
+      # Astuce : On monte tes dossiers métiers pour qu'Airflow puisse importer tes scripts !
+      - ./etl:/opt/airflow/etl
+      - ./shared_models:/opt/airflow/shared_models
+
+  # 4. Le Scheduler (Le cœur qui décide quand lancer les tâches)
+  airflow-scheduler:
+    build: ./airflow
+    command: scheduler
+    restart: always
+    depends_on:
+      airflow-postgres:
+        condition: service_healthy
+      airflow-init:
+        condition: service_completed_successfully
+    environment:
+      PYTHONPATH: /opt/airflow/etl
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${DB_USER}:${DB_PASS}@airflow-postgres:5432/airflow
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__LOAD_EXAMPLES: False
+      DB_HOST: airflow-postgres
+      DB_PORT: 5432
+      DB_NAME: airflow
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/logs:/opt/airflow/logs
+      - ./airflow/plugins:/opt/airflow/plugins
+      - ./etl:/opt/airflow/etl
+      - ./shared_models:/opt/airflow/shared_models

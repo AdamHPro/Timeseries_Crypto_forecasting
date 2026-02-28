@@ -4,7 +4,7 @@ import os
 import pandas as pd
 import psycopg2
 from psycopg2 import extras
-from config import get_db_config
+from src.config import get_db_config
 from contextlib import contextmanager
 
 logger = logging.getLogger(__name__)

@@ -24,7 +24,3 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copie du reste du code
 COPY . .
-
-# --- ATTENTION AU CHEMIN ---
-# Si ton fichier est dans etl/src/main.py, la commande est :
-CMD ["python", "src/main.py"]

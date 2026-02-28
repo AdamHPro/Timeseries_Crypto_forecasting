@@ -6,8 +6,8 @@ import pandas as pd
 import os
 import shutil
 from pathlib import Path
-from config import get_db_config
-from data_fetching import pull_data_from_yfinance
+from src.config import get_db_config
+from src.data_fetching import pull_data_from_yfinance
 
 
 logger = logging.getLogger(__name__)

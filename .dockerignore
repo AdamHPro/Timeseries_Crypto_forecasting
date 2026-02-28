@@ -7,3 +7,6 @@ data_lake/
 __pycache__/
 data_lake/*.*
 .DS_Store
+airflow_db_data/
+logs/
+.vscode

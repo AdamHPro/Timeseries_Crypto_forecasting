@@ -135,6 +135,7 @@ def train_xgboost_model(df, features_to_drop=['target', 'Open', 'High', 'Low']):
 
     # Convert log return back to percentage for human readability
     predicted_return_pct = (np.exp(prediction_log_ret) - 1) * 100
+    logging.info(f"length of prediction: {len(predicted_return_pct)}")
     logging.info(
         f"Predicted return for the next 7 days: {predicted_return_pct[0]:.2f}%")
     return predicted_return_pct
