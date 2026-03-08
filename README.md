@@ -67,6 +67,6 @@ The architecture of the project consists of the following components:
 
 3. Model Serving: FastAPI application to serve the trained model and provide predictions via RESTful endpoints. (/api)
 
-4. Frontend Interface: React.js application to provide a user-friendly interface for interacting with the model and giving predictions. (/front)
+4. Frontend Interface: React.js application to provide a user-friendly interface. (/front)
 
 5. Database: PostgreSQL database to store historical cryptocurrency data and model predictions. (db)
