@@ -27,7 +27,7 @@ Building an ETL with an API and a Frontend to use a timeseries forecasting model
 
 ## Stack
 
-- Backend: Python
+- Backend: Python/FastAPI
 - Frontend: React.js
 - Orchestration: Airflow
 - Database: PostgreSQL
