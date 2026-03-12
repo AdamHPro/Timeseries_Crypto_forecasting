@@ -1,70 +1,105 @@
-# Timeseries_Cryptos_forecasting
+# Time Series Crypto Forecasting
 
-Building an ETL with an API and a Frontend to use a timeseries forecasting model to predict cryptocurrency prices.
+End-to-end crypto forecasting project with:
+- an ETL and training pipeline,
+- a FastAPI backend,
+- a React frontend,
+- PostgreSQL,
+- and Airflow orchestration.
 
-## Run the project:
-
-1. Clone the repository:
-
-   ```bash
-   git clone
-      cd Timeseries_Crypto_forecasting
-   ```
-
-2. copy the .env.example to .env (and modify the variables if needed):
-
-   ```bash
-   cp .env.example .env
-   ```
-
-3. Build and run the Docker containers:
-
-   ```bash
-   docker-compose up --build
-   ```
-
-4. Access the frontend application at `http://localhost:3000`.
-
-## Stack
-
-- Backend: Python/FastAPI
-- Frontend: React.js
-- Orchestration: Airflow
-- Database: PostgreSQL
-- Deployment: Docker
-- Version Control: Git/GitHub
-
-## Learning objectives
-
-- Understand the fundamentals of time series analysis and forecasting.
-- Gain hands-on experience with LSTM neural networks for time series prediction.
-- Learn to preprocess and visualize time series data.
-- Develop skills in building and deploying machine learning models using Python and relevant libraries.
-- Understand the challenges and considerations when working with cryptocurrency data, such as volatility and market trends.
-- Gain experience in integrating machine learning models into web applications for real-time predictions.
-- Learn to use Docker for containerization and deployment of machine learning applications.
-
-## Project Duration
-
-The project is expected to take approximately 8-12 weeks, depending on the complexity of the model and the depth of analysis required.
-
-## Structure
-
-- `api/`: Contains the FastAPI code for serving the model.
-- `etl/`: Contains scripts for data extraction, transformation, and loading.
-- `front/`: Contains the React.js frontend code.
-- db: Postgresql database for storing historical cryptocurrency data.
+The pipeline fetches BTC/USD market data, updates the database, trains an XGBoost model, and exposes the latest prediction through the API.
 
 ## Architecture
 
-The architecture of the project consists of the following components:
+1. **ETL + Training (`etl/`)**
+   - Fetches new BTC/USD data.
+   - Stores parquet files in `data_lake/`.
+   - Updates PostgreSQL.
+   - Trains model and saves artifacts in `shared_models/`.
 
-1. Data Collection: Using APIs to gather new recent historical cryptocurrency data (comparison with the actual database, and upsert in the db). Store the new data in data_lake parquet. Train the model with the new data from data_lake. (/etl)
+2. **API (`api/`)**
+   - Serves health and prediction endpoints.
+   - Reads latest model prediction from PostgreSQL.
 
-2. Put the result in a volume, accesible by /api
+3. **Frontend (`front/`)**
+   - Calls the API and displays prediction data.
 
-3. Model Serving: FastAPI application to serve the trained model and provide predictions via RESTful endpoints. (/api)
+4. **Airflow (`airflow/`)**
+   - Schedules and orchestrates the daily ETL/training pipeline.
 
-4. Frontend Interface: React.js application to provide a user-friendly interface. (/front)
+## Tech Stack
 
-5. Database: PostgreSQL database to store historical cryptocurrency data and model predictions. (db)
+- **Backend:** FastAPI (Python)
+- **Pipeline:** Python ETL + XGBoost
+- **Frontend:** React
+- **Orchestration:** Apache Airflow
+- **Database:** PostgreSQL
+- **Containerization:** Docker + Docker Compose
+
+## Quick Start
+
+### Prerequisites
+
+- Docker
+- Docker Compose
+
+### 1) Clone the repository
+
+```bash
+git clone <your-repo-url>
+cd Timeseries_Crypto_forecasting
+```
+
+### 2) Configure environment variables
+
+```bash
+cp .env.example .env
+```
+
+Default variables in `.env.example`:
+- `DB_HOST=localhost`
+- `DB_PORT=5433`
+- `DB_NAME=postgres`
+- `DB_USER=postgres`
+- `DB_PASS=postgres`
+- `BACKEND_CORS_ORIGINS=http://localhost:3000`
+- `REACT_APP_API_URL=http://localhost:8000`
+
+### 3) Build and start all services
+
+```bash
+docker-compose up --build
+```
+
+### 4) Access services
+
+- Frontend: `http://localhost:3000`
+- FastAPI: `http://localhost:8000`
+- FastAPI docs: `http://localhost:8000/docs`
+- Airflow UI: `http://localhost:8080` (default: `admin` / `admin`)
+- Main PostgreSQL (project DB): `localhost:5433`
+
+## Main API Endpoints
+
+- `GET /health` → service status
+- `GET /predictions/latest` → latest prediction record
+
+## Project Structure
+
+- `api/` FastAPI application
+- `etl/` ETL, data update, and model training code
+- `front/` React frontend
+- `airflow/` Airflow DAGs and config
+- `data_lake/` parquet datasets
+- `shared_models/` trained model artifacts
+- `docker-compose.yml` multi-service local environment
+
+## Notes
+
+- The Airflow DAG (`mon_premier_etl_moderne`) is scheduled daily.
+- Model artifacts are shared between ETL and API through `shared_models/`.
+- If services fail at startup, check logs with:
+
+```bash
+docker-compose logs -f
+```
