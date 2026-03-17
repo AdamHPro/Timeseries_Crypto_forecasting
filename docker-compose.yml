@@ -157,3 +157,4 @@ services:
       - ./airflow/plugins:/opt/airflow/plugins
       - ./etl:/opt/airflow/etl
       - ./shared_models:/opt/airflow/shared_models
+      - ./data_lake:/opt/airflow/data_lake
