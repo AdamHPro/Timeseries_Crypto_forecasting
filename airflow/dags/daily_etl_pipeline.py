@@ -33,7 +33,7 @@ default_args = {
 
 
 @dag(
-    dag_id='mon_premier_etl_moderne',
+    dag_id='forecasting_pipeline',
     default_args=default_args,
     start_date=pendulum.datetime(2023, 1, 1, tz="UTC"),
     schedule_interval='0 6 * * *',
