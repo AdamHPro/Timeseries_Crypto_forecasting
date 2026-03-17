@@ -46,7 +46,7 @@ The pipeline fetches BTC/USD market data, updates the database, trains an XGBoos
 ### 1) Clone the repository
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/AdamHPro/Timeseries_Crypto_forecasting.git
 cd Timeseries_Crypto_forecasting
 ```
 
