@@ -98,8 +98,3 @@ docker-compose up --build
 
 - The Airflow DAG (`mon_premier_etl_moderne`) is scheduled daily.
 - Model artifacts are shared between ETL and API through `shared_models/`.
-- If services fail at startup, check logs with:
-
-```bash
-docker-compose logs -f
-```
