@@ -79,7 +79,7 @@ docker-compose up --build
 - Airflow UI: `http://localhost:8080` (default: `admin` / `admin`)
 - Main PostgreSQL (project DB): `localhost:5433`
 
-## Main API Endpoints (used by the FrontEnd)
+## Main API Endpoints (also for the FrontEnd)
 
 - `GET /health` → service status
 - `GET /predictions/latest` → latest prediction record
