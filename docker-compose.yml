@@ -51,7 +51,6 @@ services:
       - ./api:/app
       - ./shared_models:/app/models:ro
     environment:
-      #The api also needs the db
       DATABASE_URL: postgresql://${DB_USER}:${DB_PASS}@db:5432/${DB_NAME}
       DB_HOST: db
       DB_PORT: 5432
@@ -68,7 +67,6 @@ services:
     volumes:
       # CODE : Hot-reload of React
       - ./front/src:/app/src
-      # Node tip: Do not overwrite container's node_modules with local ones
       - /app/node_modules
     environment:
       # The API URL for React to make its fetch() requests
