@@ -66,13 +66,13 @@ services:
       - "3000:3000"
     volumes:
       # CODE : Hot-reload of React
-      - ./front/src:/app/src
+      - ./front/src:/app/srcss
       - /app/node_modules
     environment:
-      # The API URL for React to make its fetch() requests
+      # The API URL for React to make its fetch(), needed for REACTs requests
       REACT_APP_API_URL: ${REACT_APP_API_URL}
 
-  # --- INFRASTRUCTURE AIRFLOW (DÉBUT) ---
+  # --- INFRASTRUCTURE AIRFLOW (DÉBUT) ---s
 
   # 1. Base de données dédiée à Airflow (Isolation = Bonne pratique)
   airflow-postgres:
