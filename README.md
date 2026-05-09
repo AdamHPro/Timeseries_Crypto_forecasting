@@ -1,4 +1,4 @@
-# Time Series Crypto Forecasting
+# ETL Orchestrated estimation of a future prices
 
 End-to-end crypto forecasting project with:
 - an ETL and training pipeline,
